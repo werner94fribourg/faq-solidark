@@ -3,8 +3,15 @@
 {% block title %}Profile page{% endblock %}
 
 {% block admintitle %}Profile page{% endblock %}
-
 {%block main %}
+  {% for error in app.flashes('photo_changed_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }} : <span id="change_profile_picture_form_profile_picture_error_error_displayed"></span></strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {% for flashSuccess in app.flashes('verification') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
@@ -37,6 +44,14 @@
     </button>
   </div>
   {% endfor %}
+  {% for flashSuccess in app.flashes('name_changed') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{ parent() }}
 {% endblock %}
 {% block admincontent %}
@@ -61,6 +76,7 @@
             {{ form_start(changeProfilePictureForm) }}
               <label class="file btn btn-lg btn-primary" for="change_profile_picture_form_profile_picture"><span class="glyphicon glyphicon-open"></span> Change</label>
               {{ form_widget(changeProfilePictureForm.profile_picture, {'attr': {'onchange': 'submitPhotoForm()', 'style': 'display:none;'}}) }}
+              <span id="change_profile_picture_form_profile_picture_error_not_displayed" style="display:none">{{ form_errors(changeProfilePictureForm.profile_picture) }}</span>
             {{ form_end(changeProfilePictureForm) }}
           {% endif %}
         </div>
@@ -183,9 +199,9 @@
                 <label>Full Name</label>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                <p>{{user.firstname}} {{user.lastname}}{% if app.user and app.user.id == user.id %}<a type="button" id="modifyNameButton" class="modify-name form-button" data-bs-toggle="modal" data-bs-target="#modifyNameModal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
+                <p>{{user.firstname}} {{user.lastname}}{% if app.user and app.user.id == user.id %}<a type="button" id="change_name_form_button" class="modify-name form-button" data-bs-toggle="modal" data-bs-target="#change_name_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
                 {% if app.user and app.user.id == user.id %}
-                <div class="modal fade" id="modifyNameModal" tabindex="-1" aria-labelledby="modifyNameButton" aria-modal="true" role="dialog">
+                <div class="modal fade" id="change_name_form_modal" tabindex="-1" aria-labelledby="change_name_form_button" aria-modal="true" role="dialog">
                   <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -193,22 +209,26 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <form id="nameForm" class="needs-validation" novalidate>
+                        {{form_start(changeNameForm, {'attr': {'class': 'needs-validation', 'id': 'change_name_form'}})}}
                           <div class="mb-3">
-                            <label for="first_name" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="first_name" required>
-                            <div id="fist_name_error" class="invalid-feedback">First Name error message.</div>
+                            <label for="change_name_form_first_name" class="form-label">First Name</label>
+                            {{form_widget(changeNameForm.first_name, {'attr': {'class': 'form-control'}})}}
+                            <div id="change_name_form_first_name_error" class="invalid-feedback">
+                              {{form_errors(changeNameForm.first_name)}}
+                            </div>
                           </div>
                           <div class="mb-3">
-                            <label for="last_name" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="last_name" required>
-                            <div id="last_name_error" class="invalid-feedback">Last Name error message.</div>
+                            <label for="change_name_form_last_name" class="form-label">Last Name</label>
+                            {{form_widget(changeNameForm.last_name, {'attr': {'class': 'form-control'}})}}
+                            <div id="change_name_form_last_name_error" class="invalid-feedback">
+                              {{form_errors(changeNameForm.last_name)}}
+                            </div>
                           </div>
-                        </form>
+                        {{form_end(changeNameForm)}}
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" form="nameForm" class="btn btn-primary">Save changes</button>
+                        <button type="submit" form="change_name_form" class="btn btn-primary">Save changes</button>
                       </div>
                     </div>
                   </div>
@@ -768,12 +788,19 @@
     e.preventDefault();
     $('#change-password-link')[0].click();
   });
+
+  var errorText = $('#change_profile_picture_form_profile_picture_error_not_displayed').text();
+  $('#change_profile_picture_form_profile_picture_error_error_displayed').text(errorText);
   
   function submitPhotoForm(){
     setTimeout(function(){
       $('form[name=change_profile_picture_form]').submit();
     }, 100);
   }
+    {% if nameChangedSubmitted %}
+      var z= document.getElementById("change_name_form").classList.add("was-validated");
+      $('#change_name_form_button')[0].click();
+    {% endif %}
   {% endif %}
 </script>
 {% endblock %}

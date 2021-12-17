@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\RegistrationFormType;
 use App\Entity\User;
+use App\Form\ChangeNameFormType;
 use App\Form\ChangePasswordRequestFormType;
 use App\Form\ChangeProfilePictureFormType;
 use App\Repository\UserRepository;
@@ -26,6 +27,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -140,37 +142,28 @@ class ProfileController extends AbstractController
     public function myProfile(Request $request, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem): Response
     {
         $user = $this->getUser();
+        //Change profile picture form
         $changeProfilePictureForm = $this->createForm(ChangeProfilePictureFormType::class);
         $changeProfilePictureForm->handleRequest($request);
-        $changeProfilePictureValidated = false;
 
-        if($changeProfilePictureForm->isSubmitted())
-        {
-            if($changeProfilePictureForm->isValid())
-            {
-                //Delete old profile picture of the user
-                $filesystem->remove([$user->getProfilePicture()]);
-                
-                //Save new profile picture and update new path
-                $profilePictureFile = $changeProfilePictureForm->get('profile_picture')->getData();
-                $profilePicturePath = $fileUploader->uploadPhoto($profilePictureFile);
-                $user->setProfilePicture($profilePicturePath);
-                
-                //Save user
-                $entityManager->persist($user);
-                $entityManager->flush();
-                $this->addFlash('photo_changed', 'Your profile photo has successfully been changed.');
-            }
-            else
-            {
-                $this->addFlash('photo_changed_error', 'A problem happened while attempting to change your profile photo.');
-                $changeProfilePictureValidated = true;
-            }
-        }
+        //Handle submission change of profile picture
+        $this->handleChangePictureSubmission($changeProfilePictureForm, $entityManager, $fileUploader, $filesystem, $user);
+        $nameChangedSubmitted = false;
+
+        //Change name form
+        $changeNameForm = $this->createForm(ChangeNameFormType::class);
+        $changeNameForm->get('first_name')->setData($user->getFirstName());
+        $changeNameForm->get('last_name')->setData($user->getLastName());
+        $changeNameForm->handleRequest($request);
+
+        //Handle submission change of Name
+        $nameChangedSubmitted = $this->handleChangeNameSubmission($changeNameForm, $entityManager, $user);
+
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'changeProfilePictureForm' => $changeProfilePictureForm->createView(),
-            'changeProfilePictureValidated' => $changeProfilePictureValidated
+            'changeNameForm' => $changeNameForm->createView(),
+            'nameChangedSubmitted' => $nameChangedSubmitted
         ]);
     }
     
@@ -180,6 +173,9 @@ class ProfileController extends AbstractController
     public function profile($id, UserRepository $userRepository): Response
     {
         $user = $userRepository->find($id);
+        if($user == $this->getUser())
+            return $this->redirectToRoute('my_profile');
+
         if($user == null)
         {
             $this->addFlash('user_not_found', 'The user requested doesn\'t exist');
@@ -402,5 +398,53 @@ class ProfileController extends AbstractController
 
         $this->addFlash('verification', 'Your email address has been verified.');
         return $this->redirectToRoute('my_profile');
+    }
+
+    private function handleChangePictureSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, $user)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                //Delete old profile picture of the user
+                $filesystem->remove([$user->getProfilePicture()]);
+                
+                //Save new profile picture and update new path
+                $profilePictureFile = $form->get('profile_picture')->getData();
+                $profilePicturePath = $fileUploader->uploadPhoto($profilePictureFile);
+                $user->setProfilePicture($profilePicturePath);
+                
+                //Save user
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->addFlash('photo_changed', 'Your profile photo has successfully been changed.');
+            }
+            else
+            {
+                $this->addFlash('photo_changed_error', 'A problem happened while attempting to change your profile photo : ');
+            }
+        }
+    }
+
+    private function HandleChangeNameSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $first_name = $form->get('first_name')->getData();
+                $last_name = $form->get('last_name')->getData();
+                $user->setFirstName($first_name);
+                $user->setLastName($last_name);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->addFlash('name_changed', 'Your name has successfully been changed.');
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }
