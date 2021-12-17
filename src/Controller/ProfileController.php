@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\RegistrationFormType;
 use App\Entity\User;
 use App\Form\ChangeNameFormType;
+use App\Form\ChangeOccupationFormType;
 use App\Form\ChangePasswordRequestFormType;
 use App\Form\ChangeProfilePictureFormType;
 use App\Repository\UserRepository;
@@ -148,22 +149,33 @@ class ProfileController extends AbstractController
 
         //Handle submission change of profile picture
         $this->handleChangePictureSubmission($changeProfilePictureForm, $entityManager, $fileUploader, $filesystem, $user);
-        $nameChangedSubmitted = false;
 
         //Change name form
         $changeNameForm = $this->createForm(ChangeNameFormType::class);
         $changeNameForm->get('first_name')->setData($user->getFirstName());
         $changeNameForm->get('last_name')->setData($user->getLastName());
         $changeNameForm->handleRequest($request);
+        $nameChangedSubmitted = false;
 
         //Handle submission change of Name
         $nameChangedSubmitted = $this->handleChangeNameSubmission($changeNameForm, $entityManager, $user);
+
+        //Change occupation form
+        $changeOccupationForm = $this->createForm(ChangeOccupationFormType::class);
+        $changeOccupationForm->get('occupation')->setData($user->getOccupation());
+        $changeOccupationForm->handleRequest($request);
+        $occupationChangedSubmitted = false;
+
+        //Handle submission change of Occupation
+        $occupationChangedSubmitted = $this->handleChangeOccupationSubmission($changeOccupationForm, $entityManager, $user);
 
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'changeProfilePictureForm' => $changeProfilePictureForm->createView(),
             'changeNameForm' => $changeNameForm->createView(),
-            'nameChangedSubmitted' => $nameChangedSubmitted
+            'nameChangedSubmitted' => $nameChangedSubmitted,
+            'changeOccupationForm' => $changeOccupationForm->createView(),
+            'occupationChangedSubmitted' => $occupationChangedSubmitted
         ]);
     }
     
@@ -426,7 +438,7 @@ class ProfileController extends AbstractController
         }
     }
 
-    private function HandleChangeNameSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
+    private function handleChangeNameSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
     {
         if($form->isSubmitted())
         {
@@ -439,6 +451,28 @@ class ProfileController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
                 $this->addFlash('name_changed', 'Your name has successfully been changed.');
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function handleChangeOccupationSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $occupation = $form->get('occupation')->getData();
+                $user->setOccupation($occupation);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->addFlash('occupation_changed', 'Your occupation has successfully been changed.');
+                return false;
             }
             else
             {

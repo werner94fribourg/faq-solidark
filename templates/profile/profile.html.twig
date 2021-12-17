@@ -249,9 +249,9 @@
                 <label>Occupation</label>
               </div>
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-                <p>{{user.occupation}}{% if app.user and app.user.id == user.id %}<a type="button" id="modifyOccupationButton" class="modify-occupation form-button" data-bs-toggle="modal" data-bs-target="#modifyOccupationModal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
+                <p>{{user.occupation}}{% if app.user and app.user.id == user.id %}<a type="button" id="change_occupation_form_button" class="modify-occupation form-button" data-bs-toggle="modal" data-bs-target="#change_occupation_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
                 {% if app.user and app.user.id == user.id %}
-                <div class="modal fade" id="modifyOccupationModal" tabindex="-1" aria-labelledby="modifyOccupationButton" aria-modal="true" role="dialog">
+                <div class="modal fade" id="change_occupation_form_modal" tabindex="-1" aria-labelledby="change_occupation_form_button" aria-modal="true" role="dialog">
                   <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -259,17 +259,19 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
                       <div class="modal-body">
-                        <form id="occupationForm" class="needs-validation" novalidate>
+                        {{form_start(changeOccupationForm, {'attr': {'class': 'needs-validation', 'id': 'change_occupation_form'}})}}
                           <div class="mb-3">
-                            <label for="occupation" class="form-label">Occupation</label>
-                            <input type="text" class="form-control" id="occupation" required>
-                            <div id="occupation_error" class="invalid-feedback">Occupation error message.</div>
+                            <label for="change_occupation_form_occupation" class="form-label">Occupation</label>
+                            {{form_widget(changeOccupationForm.occupation, {'attr': {'class': 'form-control'}})}}
+                            <div id="change_occupation_form_occupation_error" class="invalid-feedback">
+                              {{form_errors(changeOccupationForm.occupation)}}
+                            </div>
                           </div>
-                        </form>
+                        {{form_end(changeOccupationForm)}}
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" form="occupationForm" class="btn btn-primary">Save changes</button>
+                        <button type="submit" form="change_occupation_form" class="btn btn-primary">Save changes</button>
                       </div>
                     </div>
                   </div>
@@ -800,6 +802,10 @@
     {% if nameChangedSubmitted %}
       var z= document.getElementById("change_name_form").classList.add("was-validated");
       $('#change_name_form_button')[0].click();
+    {% endif %}
+    {% if occupationChangedSubmitted %}
+      var z= document.getElementById("change_occupation_form").classList.add("was-validated");
+      $('#change_occupation_form_button')[0].click();
     {% endif %}
   {% endif %}
 </script>
