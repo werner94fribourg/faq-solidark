@@ -29,6 +29,14 @@
     </button>
   </div>
   {% endfor %}
+  {% for flashSuccess in app.flashes('photo_changed') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{ parent() }}
 {% endblock %}
 {% block admincontent %}
@@ -45,14 +53,15 @@
   {% endif %}
 {% endfor %}
 <div class="container emp-profile">
-  <form method="post">
     <div class="row">
       <div class="col-lg-4 col-md-12 order-1 order-lg-1">
         <div class="profile-img">
           <img src="{{user.profilepicture}}" alt="Profile picture">
           {% if app.user and app.user.id == user.id %}
-          <label class="file btn btn-lg btn-primary" for="photo-upload"><span class="glyphicon glyphicon-open"></span> Change</label>
-          <input type="file" name="photo-upload" id="photo-upload" hidden>
+            {{ form_start(changeProfilePictureForm) }}
+              <label class="file btn btn-lg btn-primary" for="change_profile_picture_form_profile_picture"><span class="glyphicon glyphicon-open"></span> Change</label>
+              {{ form_widget(changeProfilePictureForm.profile_picture, {'attr': {'onchange': 'submitPhotoForm()', 'style': 'display:none;'}}) }}
+            {{ form_end(changeProfilePictureForm) }}
           {% endif %}
         </div>
       </div>
@@ -736,7 +745,6 @@
         </div>
       </div>
     </div>
-  </form>
   <div class="row">
     <div class="col-lg-10"></div>
     <div class="col-lg-2">
@@ -760,6 +768,12 @@
     e.preventDefault();
     $('#change-password-link')[0].click();
   });
+  
+  function submitPhotoForm(){
+    setTimeout(function(){
+      $('form[name=change_profile_picture_form]').submit();
+    }, 100);
+  }
   {% endif %}
 </script>
 {% endblock %}

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\RegistrationFormType;
 use App\Entity\User;
 use App\Form\ChangePasswordRequestFormType;
+use App\Form\ChangeProfilePictureFormType;
 use App\Repository\UserRepository;
 use App\Service\FileUploader;
 use App\Security\EmailVerifier;
@@ -24,6 +25,7 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -131,14 +133,44 @@ class ProfileController extends AbstractController
             'validated' => $validated
         ]);
     }
+
     /**
      * @Route("/my-profile", name="my_profile")
      */
-    public function myProfile(): Response
+    public function myProfile(Request $request, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem): Response
     {
         $user = $this->getUser();
+        $changeProfilePictureForm = $this->createForm(ChangeProfilePictureFormType::class);
+        $changeProfilePictureForm->handleRequest($request);
+        $changeProfilePictureValidated = false;
+
+        if($changeProfilePictureForm->isSubmitted())
+        {
+            if($changeProfilePictureForm->isValid())
+            {
+                //Delete old profile picture of the user
+                $filesystem->remove([$user->getProfilePicture()]);
+                
+                //Save new profile picture and update new path
+                $profilePictureFile = $changeProfilePictureForm->get('profile_picture')->getData();
+                $profilePicturePath = $fileUploader->uploadPhoto($profilePictureFile);
+                $user->setProfilePicture($profilePicturePath);
+                
+                //Save user
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->addFlash('photo_changed', 'Your profile photo has successfully been changed.');
+            }
+            else
+            {
+                $this->addFlash('photo_changed_error', 'A problem happened while attempting to change your profile photo.');
+                $changeProfilePictureValidated = true;
+            }
+        }
         return $this->render('profile/profile.html.twig', [
-            'user' => $user
+            'user' => $user,
+            'changeProfilePictureForm' => $changeProfilePictureForm->createView(),
+            'changeProfilePictureValidated' => $changeProfilePictureValidated
         ]);
     }
     
