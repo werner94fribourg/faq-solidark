@@ -1,0 +1,185 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Admin management{% endblock %}
+
+{% block admintitle %}Admin management{% endblock %}
+
+{% block admincontent %}
+
+<ul class="nav nav-faq justify-content-center mb-3">
+  <li class="nav-item">
+    <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="faqs-tab" data-bs-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="skills-tab" data-bs-toggle="tab" href="#skills" role="tab" aria-controls="skills" aria-selected="false">Skills</a>
+  </li>
+</ul>
+<div class="tab-content pt-40px" id="myTabContent">
+  <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
+    <div class="table-responsive">
+      <table class="table" id="users-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>First name</th>
+            <th>Last name</th>
+            <th>Occupation</th>
+            <th>Role</th>
+            <th>Profile link</th>
+            <th>Modify Role</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="userid-1">
+            <td>1</td>
+            <td>werner94@hotmail.com</td>
+            <td id="userid-1-username">werner94fribourg</td>
+            <td>Werner</td>
+            <td>Schmid</td>
+            <td>Informaticien</td>
+            <td>User</td>
+            <td><a href="#">Profile</a></td>
+            <td>
+              <form id="set_admin_rights" action="#" method="POST">
+                <select name="user_role" onchange="this.form.submit();">
+                  <option value="1">Admin</option>
+                  <option value="2" selected>User</option>
+                </select>
+              </form>
+            </td>
+            <td>
+              <a class="delete_user" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div><!-- end tab-pane -->
+  <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
+    <div class="table-responsive">
+      <table class="table" id="faqs-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>FAQ</th>
+            <th>Link</th>
+            <th>Moderator</th>
+            <th>Modify Moderator</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="moderatorid-1">
+            <td>1</td>
+            <td>FAQ 1</td>
+            <td><a href="#">FAQ</a></td>
+            <td>werner94fribourg</td>
+            <td>
+              <form id="set_moderator" action="#" method="POST">
+                <select name="moderator_list" onchange="this.form.submit();">
+                  <option value="1" selected>werner94fribourg</option>
+                  <option value="2">aimen06bern</option>
+                </select>
+              </form>
+            </td>
+            <td>
+              <a class="delete_faq" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row mb-4">
+      <div class="col-lg-10"></div>
+      <div class="col-lg-2">
+        <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
+      </div>
+    </div>
+    <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="faqModalLabel">New FAQ</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="faqForm" class="needs-validation" novalidate="">
+              <div class="mb-3">
+                <label for="title" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" required="">
+                <div id="name_error" class="invalid-feedback">Name error message.</div>
+              </div>
+              <div class="mb-3">
+                <label for="content" class="form-label">Moderator</label>
+                <input type="text" class="form-control" id="moderator" required="">
+                <div id="content_error" class="invalid-feedback">Moderator error message.</div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-pane -->
+  <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+    <div class="table-responsive">
+      <table class="table" id="skills-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Skill</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr id="skillid-1">
+            <td>1</td>
+            <td>Skill 1</td>
+            <td>
+              <a class="delete_skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row mb-4">
+      <div class="col-lg-10"></div>
+      <div class="col-lg-2">
+        <a type="button" id="skillButton" class="form-button" data-bs-toggle="modal" data-bs-target="#skillModal"><span class="glyphicon glyphicon-plus"></span></a>
+      </div>
+    </div>
+    <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillButton" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="questionModalLabel">New skill</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="skillForm" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" required />
+                <div id="title_error" class="invalid-feedback">Name error message.</div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="skillForm" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-pane -->
+</div><!-- end tab-content -->
+{% endblock %}

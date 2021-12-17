@@ -1,0 +1,96 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  background-color: #f5f5f5;
+  background-color: #292979;
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 330px;
+  padding: 15px;
+  margin: auto;
+}
+
+/*custom*/
+.form-signin h1 {
+  color: #E9C860;
+  font-size: 2.8em;
+}
+
+/*custom*/
+.form-signin label {
+  color: #E9C860;
+}
+
+.form-signin .checkbox {
+  font-weight: 400;
+}
+
+.form-signin .form-control {
+  position: relative;
+  box-sizing: border-box;
+  height: auto;
+  padding: 10px;
+  font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+
+.form-signin input {
+  border-color: gray; /*custom*/
+  background-color: #E9C860;
+  border-radius: 8px;
+  color: #292979;
+}
+
+.btn{
+  font-size: 1.9em;
+}
+
+a {
+  color: #ffffff;
+}
+
+.tab {
+  display: none;
+}
+
+.multistep-button {
+  display: none;
+}
+
+.step-elements {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.step {
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbbbbb;
+  border: none;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+.step.finish {
+  background-color: #04AA6D;
+}

@@ -1,0 +1,56 @@
+security:
+    enable_authenticator_manager: true
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: auto
+            cost: 15
+        App\Entity\User:
+            algorithm: auto
+            cost: 15
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: app_user_provider
+            form_login:
+                check_path: login
+                login_path: login
+                enable_csrf: true
+                default_target_path: my_profile
+                username_parameter: _email
+            logout:
+                path: logout
+                target: index
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPERADMIN: ROLE_ADMIN
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+         - { path: ^/admin, roles: ROLE_ADMIN }
+         - {path: ^/(register|login), roles: IS_ANONYMOUS}
+         - {path: /my-profile, roles: IS_AUTHENTICATED_REMEMBERED}
+         - {path: /delete-account, roles: IS_AUTHENTICATED_FULLY}
+         - {path: /modify-password, roles: IS_AUTHENTICATED_FULLY}
+        # - { path: ^/profile, roles: ROLE_USER }
+    access_denied_url: /access-denied

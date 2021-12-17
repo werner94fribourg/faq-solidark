@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block customstylesheets %}
+<link rel="stylesheet" href="{{asset('build/css/admin.css')}}"/>
+{% endblock %}
+
+{% block title %}Admin{% endblock %}
+
+
+{% block main %}
+<div class="container-fluid">
+  <main role="main" class="px-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <h1 class="h2">{% block admintitle %}Admin title{% endblock %}</h1>
+    </div>
+    {% block admincontent %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+
+{% block customjavascripts %}
+<script src="{{asset('build/js/admin.js')}}" type="text/javascript"></script>
+{% endblock %}

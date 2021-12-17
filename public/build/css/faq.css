@@ -1,0 +1,89 @@
+.search-input {
+  border-radius: 4px;
+  padding-right: calc(1.5em + 0.75rem);
+  font-size: 1.2em;
+  color: #E9C860;
+  background-color: #292979;
+  border: 1px solid #E9C860;
+  background-image: url("data:image/svg+xml;charset=utf8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23E9C860' viewBox='0 0 16 16'%3e%3cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.search-input:focus {
+  background-color: #5F8DBC;
+  color: #E9C860;
+}
+
+.search-input::placeholder {
+  color: #E9C860;
+}
+
+.theme-btn {
+  border-radius: 4px;
+  background-color: #292979;
+  color: #E9C860;
+  border-color: #E9C860;
+  width: 100%;
+  font-weight: 500;
+  padding-right: 18px;
+  padding-left: 18px;
+  line-height: 26px;
+  font-size: 15px;
+  position: relative;
+}
+
+.theme-btn:hover, .theme-btn:visited, .theme-btn:active, .theme-btn:focus{
+  color: #E9C860;
+  text-decoration: none;
+}
+
+.search-advanced-item {
+  border: 2px solid #E9C860;
+  background-color: #292979;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.la.la-gear::before {
+  content: "\f013";
+  box-sizing: border-box;
+  padding-right: 0.8em;
+  background-image: url("data:image/svg+xml;charset=utf8,%3csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23E9C860' viewBox='0 0 16 16'%3e%3cpath d='M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z'/%3e%3cpath d='M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+}
+
+.divider span {
+  display: block;
+  width: 50px;
+  height: 1px;
+  background-color: #E9C860;
+}
+
+.generic-pagination .page-link {
+  color: #E9C860;
+  background-color: #292979;
+}
+
+.pager {
+  width: 70%;
+  margin: auto;
+}
+
+.pager nav {
+  width: 50%;
+  margin: auto;
+}
+
+.pager nav ul {
+  width: 30%;
+  margin: auto;
+  font-size: 1.6em;
+}
+
+.pager p {
+  width: 50%;
+  margin: auto;
+  text-align: center;
+}
