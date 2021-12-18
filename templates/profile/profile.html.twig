@@ -52,6 +52,14 @@
     </button>
   </div>
   {% endfor %}
+  {% for flashSuccess in app.flashes('CV_changed') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{ parent() }}
 {% endblock %}
 {% block admincontent %}
@@ -116,9 +124,9 @@
       <div class="col-lg-4 col-md-12 order-2 order-lg-1">
         <div class="profile-work">
           <p>ABOUT ME</p>
-          <span class="profile-work-item"><a href="{{user.CV}}">CV</a>{% if app.user and app.user.id == user.id %}<a type="button" id="modifyCVButton" class="profile-work-item-icon change-cv" data-bs-toggle="modal" data-bs-target="#modifyCVModal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</span><br>
+          <span class="profile-work-item"><a href="{{user.CV}}">CV</a>{% if app.user and app.user.id == user.id %}<a type="button" id="change_cv_form_button" class="profile-work-item-icon change-cv" data-bs-toggle="modal" data-bs-target="#change_cv_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</span><br>
           {% if app.user and app.user.id == user.id %}
-          <div class="modal fade" id="modifyCVModal" tabindex="-1" aria-labelledby="modifyCVButton" aria-modal="true" role="dialog">
+          <div class="modal fade" id="change_cv_form_modal" tabindex="-1" aria-labelledby="change_cv_form_button" aria-modal="true" role="dialog">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
@@ -126,18 +134,20 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="CVForm" class="needs-validation" novalidate>
+                  {{form_start(changeCVForm, {'attr': {'class': 'needs-validation', 'id':'change_cv_form'}})}}
                     <div class="mb-3">
                       <div class="form-group">
-                        <input type="file" class="form-control-file" id="cv" required>
-                        <div id="cv_error" class="invalid-feedback">CV error message.</div>
+                        {{form_widget(changeCVForm.CV, {'attr': {'class' : 'form-control-file'}})}}
+                        <div id="change_cv_form_CV_error" class="invalid-feedback">
+                          {{form_errors(changeCVForm.CV)}}
+                        </div>
                       </div>
                     </div>
-                  </form>
+                  {{form_end(changeCVForm)}}
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" form="CVForm" class="btn btn-primary">Save changes</button>
+                  <button type="submit" form="change_cv_form" class="btn btn-primary">Save changes</button>
                 </div>
               </div>
             </div>
@@ -806,6 +816,10 @@
     {% if occupationChangedSubmitted %}
       var z= document.getElementById("change_occupation_form").classList.add("was-validated");
       $('#change_occupation_form_button')[0].click();
+    {% endif %}
+    {% if CVChangedSubmitted %}
+      var z = document.getElementById("change_cv_form").classList.add("was-validated");
+      $('#change_cv_form_button')[0].click();
     {% endif %}
   {% endif %}
 </script>

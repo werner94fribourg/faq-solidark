@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Form\RegistrationFormType;
 use App\Entity\User;
+use App\Form\ChangeCVFormType;
 use App\Form\ChangeNameFormType;
 use App\Form\ChangeOccupationFormType;
 use App\Form\ChangePasswordRequestFormType;
@@ -169,13 +170,23 @@ class ProfileController extends AbstractController
         //Handle submission change of Occupation
         $occupationChangedSubmitted = $this->handleChangeOccupationSubmission($changeOccupationForm, $entityManager, $user);
 
+        //Change CV form
+        $changeCVForm = $this->createForm(ChangeCVFormType::class);
+        $changeCVForm->handleRequest($request);
+        $CVChangedSubmitted = false;
+
+        //Handle submission change of CV
+        $CVChangedSubmitted = $this->handleChangeCVSubmission($changeCVForm, $entityManager, $fileUploader, $filesystem, $user);
+
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
             'changeProfilePictureForm' => $changeProfilePictureForm->createView(),
             'changeNameForm' => $changeNameForm->createView(),
             'nameChangedSubmitted' => $nameChangedSubmitted,
             'changeOccupationForm' => $changeOccupationForm->createView(),
-            'occupationChangedSubmitted' => $occupationChangedSubmitted
+            'occupationChangedSubmitted' => $occupationChangedSubmitted,
+            'changeCVForm' => $changeCVForm->createView(),
+            'CVChangedSubmitted' => $CVChangedSubmitted
         ]);
     }
     
@@ -472,6 +483,32 @@ class ProfileController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
                 $this->addFlash('occupation_changed', 'Your occupation has successfully been changed.');
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function handleChangeCVSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, $user): bool
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                //Delete old CV file of the user
+                $filesystem->remove([$user->getCV()]);
+
+                //Save new CV and update new path
+                $CVFile = $form->get('CV')->getData();
+                $CVPath = $fileUploader->uploadCV($CVFile);
+                $user->setCV($CVPath);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $this->addFlash('CV_changed', 'Your CV has successfully been changed.');
                 return false;
             }
             else
