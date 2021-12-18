@@ -15,5 +15,11 @@
 {% endblock %}
 
 {% block customjavascripts %}
+{{parent()}}
+{% block customfaqjavascripts %}
 <script src="{{asset('build/js/faq.js')}}" type="text/javascript"></script>
+<script>
+  $('#faq_main_link').addClass("active");
+</script>
+{% endblock %}
 {% endblock %}

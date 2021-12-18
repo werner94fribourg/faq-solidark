@@ -67,6 +67,11 @@ body.custom-background {
   color: #E9C860;
 }
 
+.navbar .navbar-nav .dropdown-item.active {
+  color: #FFDF00;
+  background-color: #292979;
+}
+
 .navbar .navbar-nav .nav-link.active {
   color: #FFDF00;
 }

@@ -183,3 +183,10 @@
   </div><!-- end tab-pane -->
 </div><!-- end tab-content -->
 {% endblock %}
+
+{% block customadminjavascripts %}
+{{parent()}}
+<script>
+  $('#admin_manager_link').addClass('active');
+</script>
+{% endblock %}

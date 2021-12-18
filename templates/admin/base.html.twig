@@ -19,5 +19,11 @@
 {% endblock %}
 
 {% block customjavascripts %}
+{{parent()}}
 <script src="{{asset('build/js/admin.js')}}" type="text/javascript"></script>
+{% block customadminjavascripts %}
+<script>
+  $('#admin_dropdown').addClass("active");
+</script>
+{% endblock %}
 {% endblock %}

@@ -788,9 +788,11 @@
 </div>
 {% endblock %}
 
-{% block customjavascripts %}
+{% block customadminjavascripts %}
 <script>
   {% if app.user and app.user.id == user.id %}
+  $('#profile_dropdown').addClass("active");
+  $('#my_profile_link').addClass("active");
   $('#delete-account').on('click', function(e){
     e.preventDefault();
     alert('Are you sure ?');

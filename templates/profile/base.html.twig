@@ -17,5 +17,8 @@
 {% block footer %}{% endblock %}
 
 {% block customjavascripts %}
+{{parent()}}
+{% block customprofilejavascripts %}
 <script src="{{asset('build/js/profile.js')}}" type="text/javascript"></script>
+{% endblock %}
 {% endblock %}
