@@ -30,6 +30,7 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
@@ -71,15 +72,23 @@ class ProfileController extends AbstractController
     public function deleteAccount($id, UserRepository $userRepository, EntityManagerInterface $entityManager, MailerInterface $mailer, Filesystem $filesystem): Response
     {
         $user = $userRepository->find($id);
-        $superadminUser = $userRepository->findOneByUsername('superadmin_solidark');
-        if($user->getId() == $superadminUser->getId())
-            throw new \Exception("We can't delete the superadmin user !");
+        $adminDelete = false;
+        if($this->isGranted('ROLE_SUPERADMIN', $user))
+            throw new \Exception("We can't delete a superadmin user !");
+        
         //Invalidate session if the user is deleting his own account
         if($this->getUser() == $user)
         {
             $session = $this->requestStack->getSession();
             $session = new Session();
             $session->invalidate();
+        }
+        else
+        {
+            $this->denyAccessUnlessGranted('ROLE_ADMIN');
+            if($this->isGranted('ROLE_ADMIN', $user))
+                $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
+            $adminDelete = true;
         }
         //Generate email for confirmation and send it to the user
         $email = (new TemplatedEmail())
@@ -98,6 +107,11 @@ class ProfileController extends AbstractController
         $entityManager->flush();
 
         $mailer->send($email);
+        if($adminDelete)
+        {
+            $this->addFlash('account_deleted', 'The account has successfully been removed.');
+            return $this->redirectToRoute('admin_manager');
+        }
         return $this->redirectToRoute('index', [
             'deleteAccount' => 1
         ]);
@@ -211,6 +225,27 @@ class ProfileController extends AbstractController
             ]);
         }
     }
+
+    /**
+     * @Route("/show-profile-picture/{id}", name="show_profile_picture")
+     */
+    public function showProfilePicture(UserRepository $userRepository, $id): Response
+    {
+        $user = $userRepository->find($id);
+        $pathProfilePicture = $user->getProfilePicture();
+        return new BinaryFileResponse($pathProfilePicture);
+    }
+
+    /**
+     * @Route("/show-cv/{id}", name="show_cv")
+     */
+    public function showCV(UserRepository $userRepository, $id): Response
+    {
+        $user = $userRepository->find($id);
+        $pathCV = $user->getCV();
+        return new BinaryFileResponse($pathCV);
+    }
+
     /**
      * @Route("/register", name="register")
      */

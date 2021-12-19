@@ -4,6 +4,18 @@
 
 {% block admintitle %}Admin management{% endblock %}
 
+{% block main %}
+  {% for flashSuccess in app.flashes('account_deleted') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
+
 {% block admincontent %}
 
 <ul class="nav nav-faq justify-content-center mb-3">
@@ -31,32 +43,50 @@
             <th>Occupation</th>
             <th>Role</th>
             <th>Profile link</th>
+            {% if is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') %}
             <th>Modify Role</th>
             <th>Delete</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
-          <tr id="userid-1">
-            <td>1</td>
-            <td>werner94@hotmail.com</td>
-            <td id="userid-1-username">werner94fribourg</td>
-            <td>Werner</td>
-            <td>Schmid</td>
-            <td>Informaticien</td>
-            <td>User</td>
-            <td><a href="#">Profile</a></td>
+          {% for user in users %}
+          {% set user_role = 'User' %}
+          {% for role in user.getRoles() %}
+            {% if role == 'ROLE_SUPERADMIN' %}
+              {% set user_role = 'Superadmin' %}
+            {% elseif role == 'ROLE_ADMIN' and user_role != 'Superadmin' %}
+              {% set user_role = 'Admin' %}
+            {% endif %}
+          {% endfor %}
+          <tr id="userid-{{user.id}}">
+            <td>{{loop.index}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.username}}</td>
+            <td>{{user.firstname}}</td>
+            <td>{{user.lastname}}</td>
+            <td>{{user.occupation}}</td>
+            <td>{{user_role}}</td>
+            <td><a href="{{path('profile', {'id': user.id})}}">Profile</a></td>
+            {% if is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') %}
             <td>
-              <form id="set_admin_rights" action="#" method="POST">
+            {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
+              <form action="#" method="POST">
                 <select name="user_role" onchange="this.form.submit();">
-                  <option value="1">Admin</option>
-                  <option value="2" selected>User</option>
+                  <option value="1"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
+                  <option value="2"{% if user_role == 'User' %}selected{% endif %}>User</option>
                 </select>
               </form>
+            {% endif %}
             </td>
             <td>
-              <a class="delete_user" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
+              <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}"><span class="glyphicon glyphicon-trash"></span></a>
+              {% endif %}
             </td>
+            {% endif %}
           </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -188,5 +218,11 @@
 {{parent()}}
 <script>
   $('#admin_manager_link').addClass('active');
+  $('.delete_user').on('click', function(e){
+    e.preventDefault();
+    alert('Are you sure ?');
+    var href = $(this).attr('href');
+    window.location.href = href;
+  })
 </script>
 {% endblock %}
