@@ -86,7 +86,8 @@ class ProfileController extends AbstractController
         else
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
-            if($this->isGranted('ROLE_ADMIN', $user))
+            $userRole = $user->getRoles()[0];
+            if($userRole == 'ROLE_ADMIN')
                 $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
             $adminDelete = true;
         }

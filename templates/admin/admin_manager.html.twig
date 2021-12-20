@@ -12,6 +12,22 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
+  {% endfor %} 
+  {% for flashSuccess in app.flashes('change_role_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('change_role_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }} : <span id="set_user_rights_form_user_role_error_displayed"></span></strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   {% endfor %}
   {{parent()}}
 {% endblock %}
@@ -71,12 +87,10 @@
             {% if is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') %}
             <td>
             {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
-              <form action="#" method="POST">
-                <select name="user_role" onchange="this.form.submit();">
-                  <option value="1"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
-                  <option value="2"{% if user_role == 'User' %}selected{% endif %}>User</option>
-                </select>
-              </form>
+              <select id="user_select_{{user.id}}" onchange="setUserRightsType({{user.id}});">
+                <option value="0"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
+                <option value="1"{% if user_role == 'User' %}selected{% endif %}>User</option>
+              </select>
             {% endif %}
             </td>
             <td>
@@ -89,6 +103,11 @@
           {% endfor %}
         </tbody>
       </table>
+      {{form_start(adminRightsForm, {'attr': {'id': 'set_user_rights', 'style': 'display: none;'}})}}
+          {{form_widget(adminRightsForm.user_role)}}
+          <span id="change_profile_picture_form_profile_picture_error_not_displayed">{{form_errors(adminRightsForm.user_role)}}</span>
+          {{form_widget(adminRightsForm.user_id)}}
+      {{form_end(adminRightsForm)}}
     </div>
   </div><!-- end tab-pane -->
   <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
@@ -224,5 +243,17 @@
     var href = $(this).attr('href');
     window.location.href = href;
   })
+  function setUserRightsType(user_id)
+  {
+    var selector = '#user_select_'+user_id;
+    var roleValue = $(selector).val();
+    $('#set_user_rights_user_id').val(user_id);
+    $('#set_user_rights_user_role').val(roleValue);
+    setTimeout(function(){
+      $('#set_user_rights').submit();
+    }, 100);
+  }
+  var errorText = $('#set_user_rights_form_user_role_error_not_displayed').text();
+  $('#set_user_rights_form_user_role_error_displayed').text(errorText);
 </script>
 {% endblock %}
