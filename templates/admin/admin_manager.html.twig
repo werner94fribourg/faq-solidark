@@ -1,5 +1,9 @@
 {% extends 'admin/base.html.twig' %}
-
+{% if app.session.flashbag.peek('delete_faq_success')|length > 0 or app.session.flashbag.peek('delete_faq_error')|length > 0 %}
+  {% set faqDeleted = true %}
+{% else %}
+  {% set faqDeleted = false %}
+{% endif %}
 {% block title %}Admin management{% endblock %}
 
 {% block admintitle %}Admin management{% endblock %}
@@ -20,6 +24,30 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
+  {% endfor %} 
+  {% for flashSuccess in app.flashes('new_faq_created') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %} 
+  {% for flashSuccess in app.flashes('moderator_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %} 
+  {% for flashSuccess in app.flashes('delete_faq_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
   {% endfor %}
   {% for error in app.flashes('change_role_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -29,6 +57,30 @@
     </button>
   </div>
   {% endfor %}
+  {% for error in app.flashes('moderator_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('new_faq_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_faq_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}  
   {{parent()}}
 {% endblock %}
 
@@ -38,9 +90,11 @@
   <li class="nav-item">
     <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
   </li>
+  {% if is_granted('ROLE_SUPERADMIN') %}
   <li class="nav-item">
     <a class="nav-link" id="faqs-tab" data-bs-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
   </li>
+  {% endif %}
   <li class="nav-item">
     <a class="nav-link" id="skills-tab" data-bs-toggle="tab" href="#skills" role="tab" aria-controls="skills" aria-selected="false">Skills</a>
   </li>
@@ -95,7 +149,7 @@
             </td>
             <td>
               {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
-              <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}"><span class="glyphicon glyphicon-trash"></span></a>
+              <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
               {% endif %}
             </td>
             {% endif %}
@@ -110,6 +164,7 @@
       {{form_end(adminRightsForm)}}
     </div>
   </div><!-- end tab-pane -->
+  {% if is_granted('ROLE_SUPERADMIN') %}
   <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
     <div class="table-responsive">
       <table class="table" id="faqs-table">
@@ -117,6 +172,7 @@
           <tr>
             <th>#</th>
             <th>FAQ</th>
+            <th>Description</th>
             <th>Link</th>
             <th>Moderator</th>
             <th>Modify Moderator</th>
@@ -124,33 +180,46 @@
           </tr>
         </thead>
         <tbody>
-          <tr id="moderatorid-1">
-            <td>1</td>
-            <td>FAQ 1</td>
-            <td><a href="#">FAQ</a></td>
-            <td>werner94fribourg</td>
+          {% for faq in faqs %}
+          <tr id="faqid-{{faq.id}}">
+            <td>{{loop.index}}</td>
+            <td>{{faq.name}}</td>
+            <td>{{faq.description}}</td>
+            <td><a href="#">Link</a></td>
+            <td>{% if faq.moderator %}<a href="{{path('profile', {'id': faq.moderator.id})}}">{{faq.moderator.username}}</a>{% endif %}</td>
             <td>
-              <form id="set_moderator" action="#" method="POST">
-                <select name="moderator_list" onchange="this.form.submit();">
-                  <option value="1" selected>werner94fribourg</option>
-                  <option value="2">aimen06bern</option>
-                </select>
-              </form>
+              <select id = "moderator_select_{{faq.id}}" onchange="setModerator({{faq.id}});">
+                {% if not faq.moderator %}
+                <option value="0" selected>Select a moderator</option>
+                  {% for adminUser in adminUsers %}
+                  <option value="{{adminUser.id}}">{{adminUser.username}}</option>
+                  {% endfor %}
+                {% else %}
+                  {% for adminUser in adminUsers %}
+                  <option value="{{adminUser.id}}"{% if faq.moderator.id == adminUser.id %} selected{% endif %}>{{adminUser.username}}</option>
+                  {% endfor %}
+                {% endif %}
+              </select>
             </td>
             <td>
-              <a class="delete_faq" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+              <a class="delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
             </td>
           </tr>
+          {% endfor %}
         </tbody>
       </table>
+      {{form_start(faqModeratorForm, {'attr': {'id': 'faq_moderator_form', 'style': 'display: none;'}})}}
+          {{form_widget(faqModeratorForm.id)}}
+          {{form_widget(faqModeratorForm.moderator)}}
+      {{form_end(faqModeratorForm)}}
     </div>
     <div class="row mb-4">
       <div class="col-lg-10"></div>
       <div class="col-lg-2">
-        <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
+        <a type="button" id="faq_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#faq_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
       </div>
     </div>
-    <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
+    <div class="modal fade" id="faq_form_modal" tabindex="-1" aria-labelledby="faq_form_button" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -158,27 +227,32 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="faqForm" class="needs-validation" novalidate="">
+            {{form_start(faqForm, {'attr': {'class': 'needs-validation', 'id': 'faq_form'}})}}
               <div class="mb-3">
-                <label for="title" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" required="">
-                <div id="name_error" class="invalid-feedback">Name error message.</div>
+                <label for="faq_form_name" class="form-label">Name</label>
+                {{form_widget(faqForm.name, {'attr': {'class': 'form-control'}})}}
+                <div id="faq_form_name_error" class="invalid-feedback">
+                  {{form_errors(faqForm.name)}}
+                </div>
               </div>
               <div class="mb-3">
-                <label for="content" class="form-label">Moderator</label>
-                <input type="text" class="form-control" id="moderator" required="">
-                <div id="content_error" class="invalid-feedback">Moderator error message.</div>
+                <label for="faq_form_description" class="form-label">Description</label>
+                {{form_widget(faqForm.description, {'attr': {'class': 'form-control'}})}}
+                <div id="faq_form_description_error" class="invalid-feedback">
+                  {{form_errors(faqForm.description)}}
+                </div>
               </div>
-            </form>
+            {{form_end(faqForm)}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+            <button type="submit" form="faq_form" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
   </div><!-- end tab-pane -->
+  {% endif %}
   <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
     <div class="table-responsive">
       <table class="table" id="skills-table">
@@ -253,7 +327,26 @@
       $('#set_user_rights').submit();
     }, 100);
   }
+
+  function setModerator(faq_id)
+  {
+    var selector = '#moderator_select_'+faq_id;
+    var moderatorValue = $(selector).val();
+    $('#faq_moderator_form_id').val(faq_id);
+    $('#faq_moderator_form_moderator').val(moderatorValue);
+    setTimeout(function(){
+      $('#faq_moderator_form').submit()
+    }, 100);
+  }
   var errorText = $('#set_user_rights_form_user_role_error_not_displayed').text();
   $('#set_user_rights_form_user_role_error_displayed').text(errorText);
+  {% if newFaqSubmitted %}
+    var z = document.getElementById("faq_form").classList.add("was-validated");
+    $('#faqs-tab')[0].click();
+    $('#faq_form_button')[0].click();
+  {% endif %}
+  {% if moderatorFormSubmitted or faqDeleted %}
+    $('#faqs-tab')[0].click();
+  {% endif %}
 </script>
 {% endblock %}

@@ -73,7 +73,8 @@ class ProfileController extends AbstractController
     {
         $user = $userRepository->find($id);
         $adminDelete = false;
-        if($this->isGranted('ROLE_SUPERADMIN', $user))
+        $userRole = $user->getRoles()[0];
+        if($userRole == 'ROLE_SUPERADMIN')
             throw new \Exception("We can't delete a superadmin user !");
         
         //Invalidate session if the user is deleting his own account
@@ -86,7 +87,6 @@ class ProfileController extends AbstractController
         else
         {
             $this->denyAccessUnlessGranted('ROLE_ADMIN');
-            $userRole = $user->getRoles()[0];
             if($userRole == 'ROLE_ADMIN')
                 $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
             $adminDelete = true;
