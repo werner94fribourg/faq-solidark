@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use App\Form\RegistrationFormType;
 use App\Entity\User;
+use App\Form\AddSkillType;
 use App\Form\ChangeCVFormType;
 use App\Form\ChangeNameFormType;
 use App\Form\ChangeOccupationFormType;
 use App\Form\ChangePasswordRequestFormType;
 use App\Form\ChangeProfilePictureFormType;
+use App\Repository\SkillRepository;
 use App\Repository\UserRepository;
 use App\Service\FileUploader;
 use App\Security\EmailVerifier;
@@ -156,13 +158,12 @@ class ProfileController extends AbstractController
     /**
      * @Route("/my-profile", name="my_profile")
      */
-    public function myProfile(Request $request, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem): Response
+    public function myProfile(Request $request, EntityManagerInterface $entityManager, SkillRepository $skillRepository, FileUploader $fileUploader, Filesystem $filesystem): Response
     {
         $user = $this->getUser();
         //Change profile picture form
         $changeProfilePictureForm = $this->createForm(ChangeProfilePictureFormType::class);
         $changeProfilePictureForm->handleRequest($request);
-
         //Handle submission change of profile picture
         $this->handleChangePictureSubmission($changeProfilePictureForm, $entityManager, $fileUploader, $filesystem, $user);
 
@@ -171,37 +172,38 @@ class ProfileController extends AbstractController
         $changeNameForm->get('first_name')->setData($user->getFirstName());
         $changeNameForm->get('last_name')->setData($user->getLastName());
         $changeNameForm->handleRequest($request);
-        $nameChangedSubmitted = false;
-
         //Handle submission change of Name
-        $nameChangedSubmitted = $this->handleChangeNameSubmission($changeNameForm, $entityManager, $user);
+        $this->handleChangeNameSubmission($changeNameForm, $entityManager, $user);
 
         //Change occupation form
         $changeOccupationForm = $this->createForm(ChangeOccupationFormType::class);
         $changeOccupationForm->get('occupation')->setData($user->getOccupation());
         $changeOccupationForm->handleRequest($request);
-        $occupationChangedSubmitted = false;
-
         //Handle submission change of Occupation
-        $occupationChangedSubmitted = $this->handleChangeOccupationSubmission($changeOccupationForm, $entityManager, $user);
+        $this->handleChangeOccupationSubmission($changeOccupationForm, $entityManager, $user);
 
         //Change CV form
         $changeCVForm = $this->createForm(ChangeCVFormType::class);
         $changeCVForm->handleRequest($request);
-        $CVChangedSubmitted = false;
-
         //Handle submission change of CV
-        $CVChangedSubmitted = $this->handleChangeCVSubmission($changeCVForm, $entityManager, $fileUploader, $filesystem, $user);
+        $this->handleChangeCVSubmission($changeCVForm, $entityManager, $fileUploader, $filesystem, $user);
 
+        //Add skill form
+        $addSkillForm = $this->createForm(AddSkillType::class, null , ['user' => $user]);
+        $addSkillForm->handleRequest($request);
+        //Handle submission of new skill to the user
+        $this->handleAddSkillSubmission($addSkillForm, $entityManager, $user);
+
+        //List of all skills
+        $skills = $skillRepository->findAll();
         return $this->render('profile/profile.html.twig', [
             'user' => $user,
+            'skills' => $skills,
             'changeProfilePictureForm' => $changeProfilePictureForm->createView(),
             'changeNameForm' => $changeNameForm->createView(),
-            'nameChangedSubmitted' => $nameChangedSubmitted,
             'changeOccupationForm' => $changeOccupationForm->createView(),
-            'occupationChangedSubmitted' => $occupationChangedSubmitted,
             'changeCVForm' => $changeCVForm->createView(),
-            'CVChangedSubmitted' => $CVChangedSubmitted
+            'addSkillForm' => $addSkillForm->createView()
         ]);
     }
     
@@ -394,9 +396,7 @@ class ProfileController extends AbstractController
                 $profilePictureErrorMessage = "Please upload a picture in .jpeg or .png format.";
         }
         else
-        {
             $profilePictureErrorMessage = "Please upload your Profile picture.";
-        }
         //Extension validation of CV
         if($CV != '')
         {
@@ -405,19 +405,15 @@ class ProfileController extends AbstractController
                 $CVErrorMessage = "Please upload a pdf file.";
         }
         else
-        {
             $CVErrorMessage = "Please upload your CV.";
-        }
         //Create test user to check validation of occupation
         $user = new User();
         $user->setOccupation($occupation);
         $violations = $validator->validate($user);
         //Retrieve validation errors
         foreach($violations as $violation)
-        {
             if($violation->getPropertyPath() == 'occupation')
                 $occupationErrorMessage = $violation->getMessage();
-        }
 
         //Send response
         return $this->json([
@@ -434,15 +430,11 @@ class ProfileController extends AbstractController
     {
         $id = $request->get('id');
         if($id === null)
-        {
             return $this->redirectToRoute('register');
-        }
 
         $user = $userRepository->find($id);
         if($user === null)
-        {
             return $this->redirectToRoute('register');
-        }
 
         //Validation of the email by clicking the confirmation link
         try
@@ -459,7 +451,7 @@ class ProfileController extends AbstractController
         return $this->redirectToRoute('my_profile');
     }
 
-    private function handleChangePictureSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, $user)
+    private function handleChangePictureSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, User $user)
     {
         if($form->isSubmitted())
         {
@@ -476,16 +468,14 @@ class ProfileController extends AbstractController
                 //Save user
                 $entityManager->persist($user);
                 $entityManager->flush();
-                $this->addFlash('photo_changed', 'Your profile photo has successfully been changed.');
+                $this->addFlash('photo_changed_success', 'Your profile photo has successfully been changed.');
             }
             else
-            {
                 $this->addFlash('photo_changed_error', 'A problem happened while attempting to change your profile photo : ');
-            }
         }
     }
 
-    private function handleChangeNameSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
+    private function handleChangeNameSubmission(Form $form, EntityManagerInterface $entityManager, User $user)
     {
         if($form->isSubmitted())
         {
@@ -497,18 +487,14 @@ class ProfileController extends AbstractController
                 $user->setLastName($last_name);
                 $entityManager->persist($user);
                 $entityManager->flush();
-                $this->addFlash('name_changed', 'Your name has successfully been changed.');
-                return false;
+                $this->addFlash('change_name_success', 'Your name has successfully been changed.');
             }
             else
-            {
-                return true;
-            }
+                $this->addFlash('change_name_error', 'A problem occurred while attempting to change your name.');
         }
-        return false;
     }
 
-    private function handleChangeOccupationSubmission(Form $form, EntityManagerInterface $entityManager, $user): bool
+    private function handleChangeOccupationSubmission(Form $form, EntityManagerInterface $entityManager, User $user)
     {
         if($form->isSubmitted())
         {
@@ -518,18 +504,14 @@ class ProfileController extends AbstractController
                 $user->setOccupation($occupation);
                 $entityManager->persist($user);
                 $entityManager->flush();
-                $this->addFlash('occupation_changed', 'Your occupation has successfully been changed.');
-                return false;
+                $this->addFlash('change_occupation_success', 'Your occupation has successfully been changed.');
             }
             else
-            {
-                return true;
-            }
+                $this->addFlash('change_occupation_error', 'There was an error while trying to change your occupation.');
         }
-        return false;
     }
 
-    private function handleChangeCVSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, $user): bool
+    private function handleChangeCVSubmission(Form $form, EntityManagerInterface $entityManager, FileUploader $fileUploader, Filesystem $filesystem, User $user)
     {
         if($form->isSubmitted())
         {
@@ -544,14 +526,33 @@ class ProfileController extends AbstractController
                 $user->setCV($CVPath);
                 $entityManager->persist($user);
                 $entityManager->flush();
-                $this->addFlash('CV_changed', 'Your CV has successfully been changed.');
-                return false;
+                $this->addFlash('change_CV_success', 'Your CV has successfully been changed.');
             }
             else
-            {
-                return true;
-            }
+                $this->addFlash('change_CV_error', 'There was a problem while trying to change your CV.');
         }
-        return false;
+    }
+
+    private function handleAddSkillSubmission(Form $form, EntityManagerInterface $entityManager, User $user)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $skill = $form->get('skill')->getData();
+                $userSkills = $user->getUserSkills();
+                if($userSkills->contains($skill))
+                    $this->addFlash('add_skill_error', 'The user already has this skill.');
+                else
+                {
+                    $user->addUserSkill($skill);
+                    $entityManager->persist($user);
+                    $entityManager->flush();
+                    $this->addFlash('add_skill_success', 'The skill was successfuly added to the user.');
+                }
+            }
+            else
+                $this->addFlash('add_skill_error', 'The skill submitted isn\'t valid.');
+        }
     }
 }

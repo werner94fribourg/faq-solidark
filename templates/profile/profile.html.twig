@@ -1,17 +1,35 @@
 {% extends 'admin/base.html.twig' %}
 
+{% if app.session.flashbag.peek('change_name_error')|length > 0 %}
+  {% set changeNameAttempt = true %}
+{% else %}
+  {% set changeNameAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('change_occupation_error')|length > 0 %}
+  {% set changeOccupationAttempt = true %}
+{% else %}
+  {% set changeOccupationAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('change_CV_error')|length > 0 %}
+  {% set changeCVAttempt = true %}
+{% else %}
+  {% set changeCVAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('photo_changed_error')|length > 0 %}
+  {% set changePhotoAttempt = true %}
+{% else %}
+  {% set changePhotoAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('add_skill_error')|length > 0 %}
+  {% set addSkillAttempt = true %}
+{% else %}
+  {% set addSkillAttempt = false %}
+{% endif %}
+  
 {% block title %}Profile page{% endblock %}
 
 {% block admintitle %}Profile page{% endblock %}
 {% block main %}
-  {% for error in app.flashes('photo_changed_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }} : <span id="change_profile_picture_form_profile_picture_error_error_displayed"></span></strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
   {% for flashSuccess in app.flashes('verification') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
@@ -36,7 +54,7 @@
     </button>
   </div>
   {% endfor %}
-  {% for flashSuccess in app.flashes('photo_changed') %}
+  {% for flashSuccess in app.flashes('photo_changed_success') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -44,7 +62,15 @@
     </button>
   </div>
   {% endfor %}
-  {% for flashSuccess in app.flashes('name_changed') %}
+  {% for error in app.flashes('photo_changed_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }} : <span id="change_profile_picture_form_profile_picture_error_error_displayed"></span></strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('change_name_success') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -52,9 +78,57 @@
     </button>
   </div>
   {% endfor %}
-  {% for flashSuccess in app.flashes('CV_changed') %}
+  {% for error in app.flashes('change_name_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('change_occupation_success') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('change_occupation_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('change_CV_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('change_CV_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('add_skill_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('add_skill_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -130,7 +204,7 @@
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="questionModalLabel">Modify CV</h5>
+                  <h5 class="modal-title" id="modifyCVModalLabel">Modify CV</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -156,36 +230,32 @@
           <span class="profile-work-item"><a href="#">Personal website</a>{% if app.user and app.user.id == user.id %}<!--<a class="profile-work-item-icon change-website" href="#"><span class="glyphicon glyphicon-pencil"></span></a>-->{% endif %}</span><br>
           <span class="profile-work-item"><a href="#">LinkedIn profile</a>{% if app.user and app.user.id == user.id %}<!--<a class="profile-work-item-icon change-linkedin-profile" href="#"><span class="glyphicon glyphicon-pencil"></span></a>-->{% endif %}</span>
           <p>SKILLS</p>
-          <span class="profile-work-item"><a href="">Web Designer</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
-          <span class="profile-work-item"><a href="">Web Developer</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
-          <span class="profile-work-item"><a href="">WordPress</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
-          <span class="profile-work-item"><a href="">WooCommerce</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
-          <span class="profile-work-item"><a href="">PHP, .Net</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
+          {% for skill in user.getUserSkills() %}
+          <span class="profile-work-item"><a href="#">{{skill.name}}</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
+          {% endfor %}
           {% if app.user and app.user.id == user.id %}
-          <span class="profile-work-item"><a type="button" id="skillButton" class="profile-work-item-icon add-skill" data-bs-toggle="modal" data-bs-target="#skillModal"><span class="glyphicon glyphicon-plus"></span></a></span><br>
-          <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillButton" aria-modal="true" role="dialog">
+          <span class="profile-work-item"><a type="button" id="add_skill_button" class="profile-work-item-icon add-skill" data-bs-toggle="modal" data-bs-target="#add_skill_modal"><span class="glyphicon glyphicon-plus"></span></a></span><br>
+          <div class="modal fade" id="add_skill_modal" tabindex="-1" aria-labelledby="add_skill_button" aria-modal="true" role="dialog">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="questionModalLabel">New skill</h5>
+                  <h5 class="modal-title" id="skillModalLabel">New skill</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="skillForm" class="needs-validation" novalidate>
+                  {{form_start(addSkillForm, {'attr': {'class': 'needs-validation', 'id': 'add_skill_form'}})}}
                     <div class="mb-3">
-                      <label for="skill" class="form-label">Skill</label>
-                      <select id="skill" class="form-select">
-                        <option selected="" value="0">Skill 1</option>
-                        <option value="1">Skill 2</option>
-                        <option value="2">Skill 3</option>
-                        <option value="3">Skill 4</option>
-                      </select>
+                      <label for="add_skill_skill" class="form-label">Skill</label>
+                      {{form_widget(addSkillForm.skill, {'attr': {'class': 'form-select'}})}}
+                      <div id="add_skill_skill_error" class="invalid-feedback">
+                          {{form_errors(addSkillForm.skill)}}
+                      </div>
                     </div>
-                  </form>
+                  {{form_end(addSkillForm)}}
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" form="skillForm" class="btn btn-primary">Save changes</button>
+                  <button type="submit" form="add_skill_form" class="btn btn-primary">Save changes</button>
                 </div>
               </div>
             </div>
@@ -791,37 +861,41 @@
 {% block customadminjavascripts %}
 <script>
   {% if app.user and app.user.id == user.id %}
-  $('#profile_dropdown').addClass("active");
-  $('#my_profile_link').addClass("active");
-  $('#delete-account').on('click', function(e){
-    e.preventDefault();
-    alert('Are you sure ?');
-    $('#delete-account-link')[0].click();
-  });
-  $('#change-password').on('click', function(e){
-    e.preventDefault();
-    $('#change-password-link')[0].click();
-  });
-
-  var errorText = $('#change_profile_picture_form_profile_picture_error_not_displayed').text();
-  $('#change_profile_picture_form_profile_picture_error_error_displayed').text(errorText);
-  
-  function submitPhotoForm(){
-    setTimeout(function(){
-      $('form[name=change_profile_picture_form]').submit();
-    }, 100);
-  }
-    {% if nameChangedSubmitted %}
-      var z= document.getElementById("change_name_form").classList.add("was-validated");
+    $('#profile_dropdown').addClass("active");
+    $('#my_profile_link').addClass("active");
+    $('#delete-account').on('click', function(e){
+      e.preventDefault();
+      alert('Are you sure ?');
+      $('#delete-account-link')[0].click();
+    });
+    $('#change-password').on('click', function(e){
+      e.preventDefault();
+      $('#change-password-link')[0].click();
+    });
+    {% if changePhotoAttempt %}
+      var errorText = $('#change_profile_picture_form_profile_picture_error_not_displayed').text();
+      $('#change_profile_picture_form_profile_picture_error_error_displayed').text(errorText);
+    {% endif %}
+    function submitPhotoForm(){
+      setTimeout(function(){
+        $('form[name=change_profile_picture_form]').submit();
+      }, 100);
+    }
+    {% if changeNameAttempt %}
+      document.getElementById("change_name_form").classList.add("was-validated");
       $('#change_name_form_button')[0].click();
     {% endif %}
-    {% if occupationChangedSubmitted %}
-      var z= document.getElementById("change_occupation_form").classList.add("was-validated");
+    {% if changeOccupationAttempt %}
+      document.getElementById("change_occupation_form").classList.add("was-validated");
       $('#change_occupation_form_button')[0].click();
     {% endif %}
-    {% if CVChangedSubmitted %}
-      var z = document.getElementById("change_cv_form").classList.add("was-validated");
+    {% if changeCVAttempt %}
+      document.getElementById("change_cv_form").classList.add("was-validated");
       $('#change_cv_form_button')[0].click();
+    {% endif %}
+    {% if addSkillAttempt %}
+      document.getElementById("add_skill_form").classList.add("was-validated");
+      $('#add_skill_button')[0].click();
     {% endif %}
   {% endif %}
 </script>

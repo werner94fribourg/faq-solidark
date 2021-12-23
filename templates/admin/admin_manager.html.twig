@@ -1,4 +1,5 @@
 {% extends 'admin/base.html.twig' %}
+
 {% if app.session.flashbag.peek('new_faq_error')|length > 0 or app.session.flashbag.peek('new_faq_success')|length > 0 %}
   {% set newFaqAttempt = true %}
 {% else %}
@@ -32,6 +33,7 @@
 {% else %}
   {% set deleteSkillAttempt = false %}
 {% endif %}
+
 {% block title %}Admin management{% endblock %}
 
 {% block admintitle %}Admin management{% endblock %}
