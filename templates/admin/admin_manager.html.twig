@@ -1,8 +1,36 @@
 {% extends 'admin/base.html.twig' %}
-{% if app.session.flashbag.peek('delete_faq_success')|length > 0 or app.session.flashbag.peek('delete_faq_error')|length > 0 %}
-  {% set faqDeleted = true %}
+{% if app.session.flashbag.peek('new_faq_error')|length > 0 or app.session.flashbag.peek('new_faq_success')|length > 0 %}
+  {% set newFaqAttempt = true %}
 {% else %}
-  {% set faqDeleted = false %}
+  {% set newFaqAttempt = false %}
+{% endif %}{% if app.session.flashbag.peek('new_faq_success')|length > 0 %}
+  {% set newFaqCreation = true %}
+{% else %}
+  {% set newFaqCreation = false %}
+{% endif %}
+{% if app.session.flashbag.peek('delete_faq_error')|length > 0 or app.session.flashbag.peek('delete_faq_success')|length > 0 %}
+  {% set deleteFaqAttempt = true %}
+{% else %}
+  {% set deleteFaqAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('moderator_error')|length > 0 or app.session.flashbag.peek('moderator_success')|length > 0 %}
+  {% set modifyModeratorAttempt = true %}
+{% else %}
+  {% set modifyModeratorAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('new_skill_error')|length > 0 or app.session.flashbag.peek('new_skill_success')|length > 0 %}
+  {% set newSkillAttempt = true %}
+{% else %}
+  {% set newSkillAttempt = false %}
+{% endif %}{% if app.session.flashbag.peek('new_skill_success')|length > 0 %}
+  {% set newSkillCreation = true %}
+{% else %}
+  {% set newSkillCreation = false %}
+{% endif %}
+{% if app.session.flashbag.peek('delete_skill_error')|length > 0 or app.session.flashbag.peek('delete_skill_success')|length > 0 %}
+  {% set deleteSkillAttempt = true %}
+{% else %}
+  {% set deleteSkillAttempt = false %}
 {% endif %}
 {% block title %}Admin management{% endblock %}
 
@@ -10,38 +38,6 @@
 
 {% block main %}
   {% for flashSuccess in app.flashes('account_deleted') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %} 
-  {% for flashSuccess in app.flashes('change_role_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %} 
-  {% for flashSuccess in app.flashes('new_faq_created') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %} 
-  {% for flashSuccess in app.flashes('moderator_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %} 
-  {% for flashSuccess in app.flashes('delete_faq_success') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -57,7 +53,15 @@
     </button>
   </div>
   {% endfor %}
-  {% for error in app.flashes('moderator_error') %}
+  {% for flashSuccess in app.flashes('change_role_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('new_faq_access_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>{{ error }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -73,6 +77,46 @@
     </button>
   </div>
   {% endfor %}
+  {% for flashSuccess in app.flashes('new_faq_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('moderator_access_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('moderator_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('moderator_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_faq_access_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {% for error in app.flashes('delete_faq_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>{{ error }}</strong>
@@ -80,7 +124,47 @@
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
-  {% endfor %}  
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_faq_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('new_skill_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('new_skill_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_skill_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_skill_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{parent()}}
 {% endblock %}
 
@@ -264,41 +348,45 @@
           </tr>
         </thead>
         <tbody>
-          <tr id="skillid-1">
-            <td>1</td>
-            <td>Skill 1</td>
+          {% for skill in skills %}
+          <tr id="skillid-{{skill.id}}">
+            <td>{{loop.index}}</td>
+            <td>{{skill.name}}</td>
             <td>
               <a class="delete_skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>
             </td>
           </tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
     <div class="row mb-4">
       <div class="col-lg-10"></div>
       <div class="col-lg-2">
-        <a type="button" id="skillButton" class="form-button" data-bs-toggle="modal" data-bs-target="#skillModal"><span class="glyphicon glyphicon-plus"></span></a>
+        <a type="button" id="skill_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#skill_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
       </div>
     </div>
-    <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillButton" aria-hidden="true">
+    <div class="modal fade" id="skill_form_modal" tabindex="-1" aria-labelledby="skill_form_button" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="questionModalLabel">New skill</h5>
+            <h5 class="modal-title" id="skillModalLabel">New skill</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="skillForm" class="needs-validation" novalidate>
+            {{form_start(skillForm, {'attr': {'class' : 'needs-validation', 'id': 'skill_form'}})}}
               <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" required />
-                <div id="title_error" class="invalid-feedback">Name error message.</div>
+                <label for="skill_form_name" class="form-label">Name</label>
+                {{form_widget(skillForm.name, {'attr': {'class': 'form-control'}})}}
+                <div id="skill_form_name_error" class="invalid-feedback">
+                  {{form_errors(skillForm.name)}}
+                </div>
               </div>
-            </form>
+            {{form_end(skillForm)}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="skillForm" class="btn btn-primary">Save changes</button>
+            <button type="submit" form="skill_form" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
@@ -340,13 +428,19 @@
   }
   var errorText = $('#set_user_rights_form_user_role_error_not_displayed').text();
   $('#set_user_rights_form_user_role_error_displayed').text(errorText);
-  {% if newFaqSubmitted %}
-    var z = document.getElementById("faq_form").classList.add("was-validated");
+  {% if newFaqAttempt or deleteFaqAttempt or modifyModeratorAttempt %}
     $('#faqs-tab')[0].click();
+  {% endif %}
+  {% if (not newFaqCreation) and newFaqAttempt %}
+    document.getElementById("faq_form").classList.add("was-validated");
     $('#faq_form_button')[0].click();
   {% endif %}
-  {% if moderatorFormSubmitted or faqDeleted %}
-    $('#faqs-tab')[0].click();
+  {% if newSkillAttempt or deleteSkillAttempt %}
+    $('#skills-tab')[0].click();
+  {% endif %}
+  {% if (not newSkillCreation) and newSkillAttempt %}
+    document.getElementById("skill_form").classList.add("was-validated");
+    $("#skill_form_button")[0].click();
   {% endif %}
 </script>
 {% endblock %}
