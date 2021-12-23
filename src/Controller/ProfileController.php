@@ -206,6 +206,32 @@ class ProfileController extends AbstractController
             'addSkillForm' => $addSkillForm->createView()
         ]);
     }
+
+    /**
+     * @Route("/delete-skill/{id}", name="delete_skill", methods={"GET"})
+     */
+    public function deleteSkill($id, SkillRepository $skillRepository, EntityManagerInterface $entityManager): Response
+    {
+        $skillToRemove = $skillRepository->find($id);
+        $user = $this->getUser();
+        if($skillToRemove == null)
+        {
+            $this->addFlash('delete_skill_error', 'The skill doesn\'t exist.');
+        }
+        else
+        {
+            if($skillToRemove->getUsersThatHasSkill()->contains($user))
+            {
+                $skillToRemove->removeUsersThatHasSkill($user);
+                $entityManager->persist($skillToRemove);
+                $entityManager->flush();
+                $this->addFlash('delete_skill_success', 'The skill was successfully removed from the user.');
+            }
+            else
+                $this->addFlash('delete_skill_error', 'The user doesn\'t have this skill.');
+        }
+        return $this->redirectToRoute('my_profile');
+    }
     
     /**
      * @Route("/profile/{id}", name="profile")
@@ -548,7 +574,7 @@ class ProfileController extends AbstractController
                     $user->addUserSkill($skill);
                     $entityManager->persist($user);
                     $entityManager->flush();
-                    $this->addFlash('add_skill_success', 'The skill was successfuly added to the user.');
+                    $this->addFlash('add_skill_success', 'The skill was successfully added to the user.');
                 }
             }
             else

@@ -134,6 +134,22 @@
     </button>
   </div>
   {% endfor %}
+  {% for flashSuccess in app.flashes('delete_skill_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_skill_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{ parent() }}
 {% endblock %}
 {% block admincontent %}
@@ -231,7 +247,7 @@
           <span class="profile-work-item"><a href="#">LinkedIn profile</a>{% if app.user and app.user.id == user.id %}<!--<a class="profile-work-item-icon change-linkedin-profile" href="#"><span class="glyphicon glyphicon-pencil"></span></a>-->{% endif %}</span>
           <p>SKILLS</p>
           {% for skill in user.getUserSkills() %}
-          <span class="profile-work-item"><a href="#">{{skill.name}}</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
+          <span class="profile-work-item"><a href="#">{{skill.name}}</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="{{path('delete_skill', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
           {% endfor %}
           {% if app.user and app.user.id == user.id %}
           <span class="profile-work-item"><a type="button" id="add_skill_button" class="profile-work-item-icon add-skill" data-bs-toggle="modal" data-bs-target="#add_skill_modal"><span class="glyphicon glyphicon-plus"></span></a></span><br>

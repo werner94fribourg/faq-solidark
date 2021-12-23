@@ -49,8 +49,9 @@ security:
     access_control:
          - { path: ^/admin, roles: ROLE_ADMIN }
          - { path: ^/(register|login), roles: IS_ANONYMOUS }
-         - { path: /my-profile, roles: IS_AUTHENTICATED_REMEMBERED }
+         - { path: /my-profile, roles: IS_AUTHENTICATED_FULLY }
          - { path: /delete-account, roles: IS_AUTHENTICATED_FULLY }
+         - { path: /delete-skill, roles: IS_AUTHENTICATED_FULLY }
          - { path: /modify-password, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
     access_denied_url: /access-denied
