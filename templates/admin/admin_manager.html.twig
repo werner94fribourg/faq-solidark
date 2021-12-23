@@ -353,7 +353,7 @@
             <td>{{loop.index}}</td>
             <td>{{skill.name}}</td>
             <td>
-              <a class="delete_skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+              <a class="delete_skill" href="{{path('delete_skill', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
             </td>
           </tr>
           {% endfor %}

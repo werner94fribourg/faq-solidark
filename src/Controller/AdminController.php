@@ -29,10 +29,6 @@ class AdminController extends AbstractController
      */
     public function adminManager(Request $request, UserRepository $userRepository, FAQRepository $fAQRepository, SkillRepository $skillRepository, EntityManagerInterface $entityManager): Response
     {
-        //List of entities to show on the dashboard
-        $users = $userRepository->findAll();
-        $faqs = $fAQRepository->findAll();
-        $skills = $skillRepository->findAll();
 
         //Admin rights form
         $adminRightsForm = $this->createForm(SetUserRightsType::class);
@@ -61,7 +57,12 @@ class AdminController extends AbstractController
 
         //Handle submission of skill form
         $this->handleNewSkillFormSubmission($skillForm, $entityManager, $newSkill);
-
+        
+        //List of entities to show on the dashboard
+        $users = $userRepository->findAll();
+        $faqs = $fAQRepository->findAll();
+        $skills = $skillRepository->findAll();
+        
         return $this->render('admin/admin_manager.html.twig', [
             'users' => $users,
             'faqs' => $faqs,
@@ -89,13 +90,28 @@ class AdminController extends AbstractController
             else
             {
                 $entityManager->remove($faq);
-                $entityManager->flush($faq);
+                $entityManager->flush();
                 $this->addFlash('delete_faq_success', 'The requested faq has successfully been removed.');
             }  
         }
         return $this->redirectToRoute('admin_manager');
     }
-
+    /**
+     * @Route("/delete-skill/{id}", name="delete_skill", methods={"GET"})
+     */
+    public function deleteSkill($id, SkillRepository $skillRepository, EntityManagerInterface $entityManager): Response
+    {
+        $skill = $skillRepository->find($id);
+        if($skill == null)
+            $this->addFlash('delete_skill_error', 'The requested skill doesn\'t exist.');
+        else
+        {
+            $entityManager->remove($skill);
+            $entityManager->flush();
+            $this->addFlash('delete_skill_success', 'The requested skill has successfully been removed.');
+        }
+        return $this->redirectToRoute('admin_manager');
+    }
     private function handleAdminRightsSubmission(Form $form, EntityManagerInterface $entityManager, UserRepository $userRepository)
     {
         if($form->isSubmitted())
