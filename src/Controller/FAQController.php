@@ -7,12 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
-* @Route("/faq")
+* @Route("/faqs")
 */
 class FAQController extends AbstractController
 {
     /**
-     * @Route("/", name="faq_main")
+     * @Route("", name="faq_main")
      */
     public function faqMain(): Response
     {
@@ -27,6 +27,16 @@ class FAQController extends AbstractController
     public function question(): Response
     {
         return $this->render('faq/question.html.twig', [
+            
+        ]);
+    }
+    
+    /**
+     * @Route("/faq", name="faq")
+     */
+    public function faq(): Response
+    {
+        return $this->render('faq/faq.html.twig', [
             
         ]);
     }

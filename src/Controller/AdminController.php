@@ -54,10 +54,9 @@ class AdminController extends AbstractController
         $newSkill = new Skill();
         $skillForm = $this->createForm(SkillFormType::class, $newSkill);
         $skillForm->handleRequest($request);
-
         //Handle submission of skill form
         $this->handleNewSkillFormSubmission($skillForm, $entityManager, $newSkill);
-        
+
         //List of entities to show on the dashboard
         $users = $userRepository->findAll();
         $faqs = $fAQRepository->findAll();
@@ -74,7 +73,22 @@ class AdminController extends AbstractController
             'skillForm' => $skillForm->createView()
         ]);
     }
-    
+    /**
+     * @Route("/skill/{id}", name="skill", methods={"GET"})
+     */
+    public function skill($id, SkillRepository $skillRepository): Response
+    {
+        $skill = $skillRepository->find($id);
+        if($skill == null)
+        {
+            $this->addFlash('skill_not_found', 'The requested skill doesn\'t exist.');
+            return $this->redirectToRoute('admin_manager');
+        }
+        return $this->render('admin/skill.html.twig', [
+            'skill' => $skill
+        ]);
+    }
+
     /**
      * @Route("/delete-faq/{id}", name="delete_faq", methods={"GET"})
      */
@@ -96,6 +110,7 @@ class AdminController extends AbstractController
         }
         return $this->redirectToRoute('admin_manager');
     }
+
     /**
      * @Route("/delete-skill/{id}", name="delete_skill", methods={"GET"})
      */
