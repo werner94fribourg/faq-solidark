@@ -88,9 +88,7 @@ class ProfileController extends AbstractController
         }
         else
         {
-            $this->denyAccessUnlessGranted('ROLE_ADMIN');
-            if($userRole == 'ROLE_ADMIN')
-                $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
+            $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
             $adminDelete = true;
         }
         //Generate email for confirmation and send it to the user
@@ -208,7 +206,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/delete-skill/{id}", name="delete_skill", methods={"GET"})
+     * @Route("/delete-skill-user/{id}", name="delete_skill_user", methods={"GET"})
      */
     public function deleteSkill($id, SkillRepository $skillRepository, EntityManagerInterface $entityManager): Response
     {
@@ -242,7 +240,7 @@ class ProfileController extends AbstractController
         if($user == $this->getUser())
             return $this->redirectToRoute('my_profile');
 
-        if($user == null)
+        if($user == null || $user->getRoles()[0] == 'ROLE_SUPERADMIN')
         {
             $this->addFlash('user_not_found', 'The user requested doesn\'t exist');
             return $this->redirectToRoute('index');

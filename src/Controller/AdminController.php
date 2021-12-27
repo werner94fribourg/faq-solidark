@@ -73,41 +73,21 @@ class AdminController extends AbstractController
             'skillForm' => $skillForm->createView()
         ]);
     }
-    /**
-     * @Route("/skill/{id}", name="skill", methods={"GET"})
-     */
-    public function skill($id, SkillRepository $skillRepository): Response
-    {
-        $skill = $skillRepository->find($id);
-        if($skill == null)
-        {
-            $this->addFlash('skill_not_found', 'The requested skill doesn\'t exist.');
-            return $this->redirectToRoute('admin_manager');
-        }
-        return $this->render('admin/skill.html.twig', [
-            'skill' => $skill
-        ]);
-    }
 
     /**
      * @Route("/delete-faq/{id}", name="delete_faq", methods={"GET"})
      */
     public function deleteFaq($id, FAQRepository $fAQRepository, EntityManagerInterface $entityManager): Response
     {
-        if(!$this->isGranted('ROLE_SUPERADMIN'))
-            $this->addFlash('delete_faq_access_error', 'Error while trying to delete the faq : Access denied.');
+        $faq = $fAQRepository->find($id);
+        if($faq == null)
+            $this->addFlash('delete_faq_error', 'The requested faq doesn\'t exist.');
         else
         {
-            $faq = $fAQRepository->find($id);
-            if($faq == null)
-                $this->addFlash('delete_faq_error', 'The requested faq doesn\'t exist.');
-            else
-            {
-                $entityManager->remove($faq);
-                $entityManager->flush();
-                $this->addFlash('delete_faq_success', 'The requested faq has successfully been removed.');
-            }  
-        }
+            $entityManager->remove($faq);
+            $entityManager->flush();
+            $this->addFlash('delete_faq_success', 'The requested faq has successfully been removed.');
+        }  
         return $this->redirectToRoute('admin_manager');
     }
 
@@ -127,6 +107,7 @@ class AdminController extends AbstractController
         }
         return $this->redirectToRoute('admin_manager');
     }
+
     private function handleAdminRightsSubmission(Form $form, EntityManagerInterface $entityManager, UserRepository $userRepository)
     {
         if($form->isSubmitted())
@@ -136,11 +117,6 @@ class AdminController extends AbstractController
                 $user_id = $form->get('user_id')->getData();
                 $userToChange = $userRepository->find($user_id);
                 $userRole = $userToChange->getRoles()[0];
-                if($userRole == 'ROLE_ADMIN' && !$this->isGranted('ROLE_SUPERADMIN'))
-                {
-                    $this->addFlash('change_role_error', 'Error while trying to change the role of the user : Access denied.');
-                    return;
-                }
                 $user_role = intval($form->get('user_role')->getData());
                 switch($user_role)
                 {
@@ -164,13 +140,11 @@ class AdminController extends AbstractController
     {
         if($form->isSubmitted())
         {
-            if(!$this->isGranted('ROLE_SUPERADMIN'))
-                $this->addFlash('new_faq_access_error', 'Error while trying to create a new faq : Access denied.');
             if($form->isValid())
             {
                 $entityManager->persist($faq);
                 $entityManager->flush();
-                $this->addFlash('new_faq_success', 'The new faq has succesfully been registered.');
+                $this->addFlash('new_faq_success', 'The new faq has successfully been registered.');
                 $faq = new FAQ();
             }
             else
@@ -182,30 +156,25 @@ class AdminController extends AbstractController
     {
         if($form->isSubmitted())
         {
-            if(!$this->isGranted('ROLE_SUPERADMIN'))
-                $this->addFlash('moderator_access_error', 'Error while trying to change the moderator of a faq : Access denied.');
-            else
+            if($form->isValid())
             {
-                if($form->isValid())
+                $faq = $fAQRepository->find($form->get('id')->getData());
+                $moderator = $userRepository->find($form->get('moderator')->getData());
+                if($faq == null)
+                    $this->addFlash('moderator_error', 'The requested faq doesn\'t exist.');
+                elseif($moderator == null)
+                    $this->addFlash('moderator_error', 'The requested user doesn\'t exist.');
+                else
                 {
-                    $faq = $fAQRepository->find($form->get('id')->getData());
-                    $moderator = $userRepository->find($form->get('moderator')->getData());
-                    if($faq == null)
-                        $this->addFlash('moderator_error', 'The requested faq doesn\'t exist.');
-                    elseif($moderator == null)
-                        $this->addFlash('moderator_error', 'The requested user doesn\'t exist.');
+                    $moderatorRole = $moderator->getRoles()[0];
+                    if($moderatorRole != 'ROLE_ADMIN')
+                        $this->addFlash('moderator_error', 'The moderator must be an admin user.');
                     else
                     {
-                        $moderatorRole = $moderator->getRoles()[0];
-                        if($moderatorRole != 'ROLE_ADMIN')
-                            $this->addFlash('moderator_error', 'The moderator must be an admin user.');
-                        else
-                        {
-                            $faq->setModerator($moderator);
-                            $entityManager->persist($faq);
-                            $entityManager->flush();
-                            $this->addFlash('moderator_success', 'The moderator has successfully been updated.');
-                        }
+                        $faq->setModerator($moderator);
+                        $entityManager->persist($faq);
+                        $entityManager->flush();
+                        $this->addFlash('moderator_success', 'The moderator has successfully been updated.');
                     }
                 }
             }

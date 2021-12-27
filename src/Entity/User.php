@@ -336,7 +336,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addModeratedFAQ(FAQ $moderatedFAQ): self
     {
-        if(in_array('ROLE_ADMIN', $this->getRoles(), true) || in_array('ROLE_SUPERADMIN', $this->getRoles(), true))
+        if(in_array('ROLE_ADMIN', $this->getRoles(), true))
         {
             if (!$this->moderatedFAQs->contains($moderatedFAQ)) {
                 $this->moderatedFAQs[] = $moderatedFAQ;
@@ -348,13 +348,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeModeratedFAQ(FAQ $moderatedFAQ): self
     {
-        if ($this->moderatedFAQs->removeElement($moderatedFAQ)) {
-            // set the owning side to null (unless already changed)
-            if ($moderatedFAQ->getModerator() === $this) {
-                $moderatedFAQ->setModerator(null);
+        if(in_array('ROLE_ADMIN', $this->getRoles(), true))
+        {
+            if ($this->moderatedFAQs->removeElement($moderatedFAQ)) {
+                // set the owning side to null (unless already changed)
+                if ($moderatedFAQ->getModerator() === $this) {
+                    $moderatedFAQ->setModerator(null);
+                }
             }
         }
-
         return $this;
     }
 

@@ -28,6 +28,11 @@ class Skill
      * @ORM\Column(type="string", length=45)
      */
     private $name;
+    
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="userSkills")
@@ -57,6 +62,18 @@ class Skill
         return $this;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+    
     /**
      * @return Collection|User[]
      */

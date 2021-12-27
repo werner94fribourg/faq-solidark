@@ -63,14 +63,6 @@
     </button>
   </div>
   {% endfor %}
-  {% for error in app.flashes('new_faq_access_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
   {% for error in app.flashes('new_faq_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>{{ error }}</strong>
@@ -87,14 +79,6 @@
     </button>
   </div>
   {% endfor %}
-  {% for error in app.flashes('moderator_access_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
   {% for error in app.flashes('moderator_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>{{ error }}</strong>
@@ -106,14 +90,6 @@
   {% for flashSuccess in app.flashes('moderator_success') %}
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  {% for error in app.flashes('delete_faq_access_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -167,14 +143,6 @@
     </button>
   </div>
   {% endfor %}
-  {% for error in app.flashes('skill_not_found') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
   {{parent()}}
 {% endblock %}
 
@@ -184,11 +152,9 @@
   <li class="nav-item">
     <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
   </li>
-  {% if is_granted('ROLE_SUPERADMIN') %}
   <li class="nav-item">
     <a class="nav-link" id="faqs-tab" data-bs-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
   </li>
-  {% endif %}
   <li class="nav-item">
     <a class="nav-link" id="skills-tab" data-bs-toggle="tab" href="#skills" role="tab" aria-controls="skills" aria-selected="false">Skills</a>
   </li>
@@ -207,22 +173,20 @@
             <th>Occupation</th>
             <th>Role</th>
             <th>Profile link</th>
-            {% if is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') %}
             <th>Modify Role</th>
             <th>Delete</th>
-            {% endif %}
           </tr>
         </thead>
         <tbody>
           {% for user in users %}
-          {% set user_role = 'User' %}
-          {% for role in user.getRoles() %}
-            {% if role == 'ROLE_SUPERADMIN' %}
-              {% set user_role = 'Superadmin' %}
-            {% elseif role == 'ROLE_ADMIN' and user_role != 'Superadmin' %}
-              {% set user_role = 'Admin' %}
-            {% endif %}
-          {% endfor %}
+            {% set user_role = 'User' %}
+            {% for role in user.getRoles() %}
+              {% if role == 'ROLE_SUPERADMIN' %}
+                {% set user_role = 'Superadmin' %}
+              {% elseif role == 'ROLE_ADMIN' and user_role != 'Superadmin' %}
+                {% set user_role = 'Admin' %}
+              {% endif %}
+            {% endfor %}
           <tr id="userid-{{user.id}}">
             <td>{{loop.index}}</td>
             <td>{{user.email}}</td>
@@ -232,21 +196,19 @@
             <td>{{user.occupation}}</td>
             <td>{{user_role}}</td>
             <td><a href="{{path('profile', {'id': user.id})}}">Profile</a></td>
-            {% if is_granted('ROLE_SUPERADMIN') or is_granted('ROLE_ADMIN') %}
             <td>
-            {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
-              <select id="user_select_{{user.id}}" onchange="setUserRightsType({{user.id}});">
-                <option value="0"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
-                <option value="1"{% if user_role == 'User' %}selected{% endif %}>User</option>
-              </select>
-            {% endif %}
-            </td>
-            <td>
-              {% if user_role == 'User' or (user_role == 'Admin' and is_granted('ROLE_SUPERADMIN')) %}
-              <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if user_role != 'Superadmin' %}
+                <select id="user_select_{{user.id}}" onchange="setUserRightsType({{user.id}});">
+                  <option value="0"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
+                  <option value="1"{% if user_role == 'User' %}selected{% endif %}>User</option>
+                </select>
               {% endif %}
             </td>
-            {% endif %}
+            <td>
+              {% if user_role != 'Superadmin' %}
+                <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% endif %}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -258,7 +220,6 @@
       {{form_end(adminRightsForm)}}
     </div>
   </div><!-- end tab-pane -->
-  {% if is_granted('ROLE_SUPERADMIN') %}
   <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
     <div class="table-responsive">
       <table class="table" id="faqs-table">
@@ -346,7 +307,6 @@
       </div>
     </div>
   </div><!-- end tab-pane -->
-  {% endif %}
   <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
     <div class="table-responsive">
       <table class="table" id="skills-table">
@@ -354,6 +314,7 @@
           <tr>
             <th>#</th>
             <th>Skill</th>
+            <th>Description</th>
             <th>Number of users</th>
             <th>Skill link</th>
             <th>Delete</th>
@@ -364,8 +325,9 @@
           <tr id="skillid-{{skill.id}}">
             <td>{{loop.index}}</td>
             <td>{{skill.name}}</td>
+            <td>{{skill.description}}</td>
             <td>0</td>
-            <td><a href="#">Link</a></td>
+            <td><a href="{{path('skill', {'id': skill.id})}}">Link</a></td>
             <td>
               <a class="delete_skill" href="{{path('delete_skill', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
             </td>
@@ -394,6 +356,11 @@
                 {{form_widget(skillForm.name, {'attr': {'class': 'form-control'}})}}
                 <div id="skill_form_name_error" class="invalid-feedback">
                   {{form_errors(skillForm.name)}}
+                </div>
+                <label for="skill_form_description" class="form-label">Description</label>
+                {{form_widget(skillForm.description, {'attr': {'class': 'form-control'}})}}
+                <div id="skill_form_description_error" class="invalid-feedback">
+                  {{form_errors(skillForm.description)}}
                 </div>
               </div>
             {{form_end(skillForm)}}

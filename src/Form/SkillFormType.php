@@ -13,6 +13,7 @@ class SkillFormType extends AbstractType
     {
         $builder
             ->add('name')
+            ->add('description')
         ;
     }
 
