@@ -213,9 +213,7 @@ class ProfileController extends AbstractController
         $skillToRemove = $skillRepository->find($id);
         $user = $this->getUser();
         if($skillToRemove == null)
-        {
             $this->addFlash('delete_skill_error', 'The skill doesn\'t exist.');
-        }
         else
         {
             if($skillToRemove->getUsersThatHasSkill()->contains($user))

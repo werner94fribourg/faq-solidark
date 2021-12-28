@@ -5,6 +5,12 @@
 {% else %}
   {% set modifySkillAttempt = false %}
 {% endif %}
+{% if app.session.flashbag.peek('add_user_error')|length > 0 %}
+  {% set addUserAttempt = true %}
+{% else %}
+  {% set addUserAttempt = false %}
+{% endif %}
+
 {% block title %}Skill {{skill.id}}{% endblock %}
 
 {% block main %}
@@ -19,6 +25,22 @@
   {% for error in app.flashes('modify_skill_error') %}
   <div class="alert alert-danger alert-dismissible fade show" role="alert">
     <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_user_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_user_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
     <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
@@ -90,8 +112,8 @@
   </div>
   {% if is_granted('ROLE_SUPERADMIN') %}
   <div class="col-lg-2">
-    <a type="button" id="add_user_button" class="form-button" data-bs-toggle="modal" data-bs-target="#add_user_modal"><span class="glyphicon glyphicon-plus"></span></a>
-    <div class="modal fade" id="add_user_modal" tabindex="-1" aria-labelledby="add_user_button" aria-hidden="true">
+    <a type="button" id="add_user_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#add_user_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+    <div class="modal fade" id="add_user_form_modal" tabindex="-1" aria-labelledby="add_user_form_button" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -99,13 +121,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="add_user_form" class="register-form needs-validation" novalidate>
+            {{form_start(addUserForm, {'attr': {'class': 'needs-validation', 'id': 'add_user_form'}})}}
               <div class="mb-3">
-                <label for="content" class="form-label">Content</label>
-                <textarea class="form-control" id="content" rows="4" required></textarea>
-                <div id="content_error" class="invalid-feedback">Content error message.</div>
+                <label for="add_user_user" class="form-label">User</label>
+                {{form_widget(addUserForm.user, {'attr': {'class': 'form-control'}})}}
+                <div id="add_user_form_user_error" class="invalid-feedback">
+                  {{form_errors(addUserForm.user)}}
+                </div>
               </div>
-            </form>
+            {{form_end(addUserForm)}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -133,7 +157,7 @@
         <div class="row mb-4">
           <div class="col-lg-10"></div>
           <div class="col-lg-2">
-            <a class="form-button delete_skill" href="#" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+            <a class="form-button delete_skill" href="{{path('delete_user_skill', {'skill_id': skill.id, 'user_id': user.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
           </div>
         </div>
         {% endif %}
@@ -151,6 +175,9 @@
 {% if modifySkillAttempt %}
   document.getElementById("skill_form").classList.add("was-validated");
   $("#skill_form_button")[0].click();
+{% endif %}
+{% if addUserAttempt %}
+
 {% endif %}
 </script>
 {% endblock %}

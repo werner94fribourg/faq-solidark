@@ -143,6 +143,14 @@
     </button>
   </div>
   {% endfor %}
+  {% for error in app.flashes('delete_user_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
   {{parent()}}
 {% endblock %}
 
@@ -326,7 +334,7 @@
             <td>{{loop.index}}</td>
             <td>{{skill.name}}</td>
             <td>{{skill.description}}</td>
-            <td>0</td>
+            <td>{{skill.usersThatHasSkill|length}}</td>
             <td><a href="{{path('skill', {'id': skill.id})}}">Link</a></td>
             <td>
               <a class="delete_skill" href="{{path('delete_skill', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
