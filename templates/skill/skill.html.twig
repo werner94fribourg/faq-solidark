@@ -11,7 +11,7 @@
   {% set addUserAttempt = false %}
 {% endif %}
 
-{% block title %}Skill {{skill.id}}{% endblock %}
+{% block title %}Skill page - {{skill.name}}{% endblock %}
 
 {% block main %}
   {% for flashSuccess in app.flashes('modify_skill_success') %}
@@ -177,7 +177,8 @@
   $("#skill_form_button")[0].click();
 {% endif %}
 {% if addUserAttempt %}
-
+  document.getElementById("add_user_form").classList.add("was-validated");
+  $("#add_user_form_button")[0].click();
 {% endif %}
 </script>
 {% endblock %}

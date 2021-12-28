@@ -2,6 +2,18 @@
 
 {% block title %}FAQ{% endblock %}
 
+{% block main %}
+  {% for error in app.flashes('faq_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }} : <span id="set_user_rights_form_user_role_error_displayed"></span></strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
+
 {% block faqcontent %}
 <ul class="nav nav-faq justify-content-center mb-3">
   <li class="nav-item">

@@ -1,55 +1,87 @@
 {% extends 'faq/base.html.twig' %}
 
-{% block title %}Question{% endblock %}
+{% if app.session.flashbag.peek('modify_faq_error')|length > 0 %}
+  {% set modifyFAQAttempt = true %}
+{% else %}
+  {% set modifyFAQAttempt = false %}
+{% endif %}
+
+{% block title %}FAQ page - {{faq.name}}{% endblock %}
+
+{% block main %}
+  {% for flashSuccess in app.flashes('modify_faq_success') %}
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>{{ flashSuccess }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_faq_error') %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>{{ error }}</strong>
+    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
 
 {% block faqcontent %}
 <div class="row">
   <div class="media-card align-items-center">
     <div class="media-body">
       <div class="tags pb-1">
-        <a href="#" class="tag-link tag-link-md tag-link-blue">FAQ 1</a>
+        <a href="#" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
       </div>
       <p class="card-text fs-14 truncate-4 lh-24">
-        For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript). Please include all relevant tags on your question; e.g., [node.js],…
+        {{faq.description}}
       </p>
       <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
-        <p class="lh-18">2177849 questions, 901 asked today, 5319 this week</p>
+        <p class="lh-18">{{faq.relatedQuestions|length}} questions, {{todayQuestions|length}} asked today, {{weeklyQuestions|length}} this week</p>
       </div>
+      {% if is_granted('ROLE_SUPERADMIN') %}
       <div class="row mb-4">
         <div class="col-lg-10"></div>
         <div class="col-lg-2">
-          <a id="faqDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-          <a type="button" id="modifyFaqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#modifyFaqModal"><span class="glyphicon glyphicon-pencil"></span></a>
-          <div class="modal fade" id="modifyFaqModal" tabindex="-1" aria-labelledby="modifyFaqButton" style="display: none;" aria-hidden="true">
+          <a class="form-button delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+          <a type="button" id="faq_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#faq_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>
+          <div class="modal fade" id="faq_form_modal" tabindex="-1" aria-labelledby="faq_form_button" style="display: none;" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="questionModalLabel">Modify FAQ</h5>
+                  <h5 class="modal-title" id="faq_form_label">Modify FAQ</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <form id="modifyFaqForm" class="needs-validation" novalidate="">
+                  {{form_start(faqForm, {'attr': {'class': 'needs-validation', 'id': 'faq_form'}})}}
                     <div class="mb-3">
-                      <label for="title" class="form-label">Name</label>
-                      <input type="text" class="form-control" id="name" required="">
-                      <div id="name_error" class="invalid-feedback">Name error message.</div>
+                      <label for="faq_form_name" class="form-label">Name</label>
+                      {{form_widget(faqForm.name, {'attr': {'class': 'form-control'}})}}
+                      <div id="faq_form_name_error" class="invalid-feedback">
+                        {{form_errors(faqForm.name)}}
+                      </div>
                     </div>
                     <div class="mb-3">
-                      <label for="description" class="form-label">Description</label>
-                      <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                      <div id="description_error" class="invalid-feedback">Description error message.</div>
+                      <label for="faq_form_description" class="form-label">Description</label>
+                      {{form_widget(faqForm.description, {'attr': {'class': 'form-control', 'rows': '4'}})}}
+                      <div id="faq_form_description_error" class="invalid-feedback">
+                        {{form_errors(faqForm.description)}}
+                      </div>
                     </div>
-                  </form>
+                  {{form_end(faqForm)}}
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" form="modifyFaqForm" class="btn btn-primary">Save changes</button>
+                  <button type="submit" form="faq_form" class="btn btn-primary">Save changes</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -57,6 +89,7 @@
   <div class="col-lg-10">
     <h5 class="h3">Related Questions</h5>
   </div>
+  {% if is_granted('ROLE_SUPERADMIN') %}
   <div class="col-lg-2">
     <a type="button" id="answerButton" class="form-button" data-bs-toggle="modal" data-bs-target="#answerModal"><span class="glyphicon glyphicon-plus"></span></a>
     <div class="modal fade" id="answerModal" tabindex="-1" aria-labelledby="answerButton" aria-hidden="true">
@@ -83,42 +116,62 @@
       </div>
     </div>
   </div>
+  {% endif %}
 </div>
 <hr>
-<div class="answer-list">
-  <div class="row">
+<div class="question-list">
+  {% for question in faq.relatedQuestions %}
+  <div id="question-{{question.id}}" class="row">
     <div class="media-card align-items-center">
       <div class="votes">
         <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-          <span class="vote-counts up">0</span>
+          <span class="vote-counts up">{{question.likingUsers|length}}</span>
           <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
         </div>
         <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-          <span class="vote-counts down">0</span>
+          <span class="vote-counts down">{{question.dislikingUsers|length}}</span>
           <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
         </div>
       </div>
       <div class="media-body">
-        <h5><a href="#">Question title</a></h5>
+        <h5><a href="#">{{question.title}}</a></h5>
         <small class="meta">
-          <span class="pr-1">1 hour ago</span>
-          <a href="#" class="author">User profile</a>
+          <span class="pr-1">{{question.creationDate|ago}}</span>
+          <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
         </small>
         <div class="tags">
-          <a href="#" class="tag-link">FAQ 1</a>
-          <a href="#" class="tag-link">FAQ 2</a>
-          <a href="#" class="tag-link">FAQ 3</a>
-          <a href="#" class="tag-link">FAQ 4</a>
+          {% for belongingFaq in question.belongingFAQs %}
+          <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+          {% endfor %}
         </div>
         <hr>
         <div class="question-content">
           <div class="question-post-body">
-            <p>I'm not able to get the data attribute from a button element.</p>
-            <p>How Can I do it ? </p>
+            {{question.content}}
           </div>
         </div>
+        {% if is_granted('ROLE_SUPERADMIN') %}
+        <div class="row mb-4">
+          <div class="col-lg-10"></div>
+          <div class="col-lg-2">
+            <a class="form-button delete_questions" href="#" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
+  {% endfor %}
 </div>
+{% endblock %}
+
+{% block customfaqjavascripts %}
+{{parent()}}
+
+<script>
+{% if modifyFAQAttempt %}
+  document.getElementById("faq_form").classList.add("was-validated");
+  $("#faq_form_button")[0].click();
+{% endif %}
+</script>
 {% endblock %}

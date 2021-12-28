@@ -248,7 +248,7 @@
             <td>{{loop.index}}</td>
             <td>{{faq.name}}</td>
             <td>{{faq.description}}</td>
-            <td><a href="#">Link</a></td>
+            <td><a href="{{path('faq', {'id': faq.id})}}">Link</a></td>
             <td>{% if faq.moderator %}<a href="{{path('profile', {'id': faq.moderator.id})}}">{{faq.moderator.username}}</a>{% endif %}</td>
             <td>
               <select id = "moderator_select_{{faq.id}}" onchange="setModerator({{faq.id}});">
