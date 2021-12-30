@@ -1,25 +1,25 @@
 {% extends 'base.html.twig' %}
 
 {% block customstylesheets %}
-<link rel="stylesheet" href="{{asset('build/css/faq.css')}}"/>
+  <link rel="stylesheet" href="{{asset('build/css/faq.css')}}"/>
 {% endblock %}
 
 {% block title %}FAQ{% endblock %}
 
 {% block main %}
-<div class="container-fluid">
-  <main role="main" class="px-4">
-    {%block faqcontent %}{% endblock %}
-  </main>
-</div>
+  <div class="container-fluid">
+    <main role="main" class="px-4">
+      {% block faqcontent %}{% endblock %}
+    </main>
+  </div>
 {% endblock %}
 
 {% block customjavascripts %}
-{{parent()}}
-{% block customfaqjavascripts %}
-<script src="{{asset('build/js/faq.js')}}" type="text/javascript"></script>
-<script>
-  $('#faq_main_link').addClass("active");
-</script>
-{% endblock %}
+  {{parent()}}
+  {% block customfaqjavascripts %}
+    <script src="{{asset('build/js/faq.js')}}" type="text/javascript"></script>
+    <script>
+      $('#faq_main_link').addClass("active");
+    </script>
+  {% endblock %}
 {% endblock %}

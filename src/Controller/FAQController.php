@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\FAQ;
+use App\Entity\Question;
 use App\Form\FaqFormType;
+use App\Form\QuestionFormType;
 use App\Repository\FAQRepository;
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,10 +23,21 @@ class FAQController extends AbstractController
     /**
      * @Route("", name="faq_main")
      */
-    public function faqMain(): Response
+    public function faqMain(Request $request, EntityManagerInterface $entityManager, QuestionRepository $questionRepository): Response
     {
+        $question = new Question();
+        //New question form
+        $questionForm = $this->createForm(QuestionFormType::class, $question);
+        $questionForm->handleRequest($request);
+        //Handling of submission of new question
+        $this->handleQuestionFormSubmission($questionForm, $entityManager, $question);
+
+        //List of entities to show on the dashboard
+        $questions = $questionRepository->findAll();
+        
         return $this->render('faq/faq_main.html.twig', [
-            
+            'questionForm' => $questionForm->createView(),
+            'questions' => $questions
         ]);
     }
 
@@ -44,13 +57,13 @@ class FAQController extends AbstractController
     public function faq($id, Request $request, FAQRepository $fAQRepository, EntityManagerInterface $entityManager, QuestionRepository $questionRepository): Response
     {
         $faq = $fAQRepository->find($id);
-        $todayQuestions = $this->getTodayQuestions($faq, $questionRepository);
-        $weeklyQuestions = $this->getWeeklyQuestions($faq, $questionRepository);
         if($faq == null)
         {
             $this->addFlash('faq_error', 'The requested faq doesn\'t exist.');
             return $this->redirectToRoute('faq_main');
         }
+        $todayQuestions = $this->getTodayQuestions($faq, $questionRepository);
+        $weeklyQuestions = $this->getWeeklyQuestions($faq, $questionRepository);
 
         //Form to modify the faq
         $faqForm = $this->createForm(FaqFormType::class, $faq);
@@ -105,6 +118,24 @@ class FAQController extends AbstractController
             }
             else
                 $this->addFlash('modify_faq_error', 'Error while trying to modify the faq.');
+        }
+    }
+
+    private function handleQuestionFormSubmission(Form $form, EntityManagerInterface $entityManager, Question $question)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $question->setCreator($this->getUser());
+                $currentDate = new \DateTime('now');
+                $question->setCreationDate($currentDate);
+                $entityManager->persist($question);
+                $entityManager->flush();
+                $this->addFlash('new_question_success', 'The question has successfully been added.');
+            }
+            else
+                $this->addFlash('new_question_error', 'Error while trying to add the question.');
         }
     }
 }

@@ -3,50 +3,50 @@
 {% block title %}Login{% endblock %}
 
 {% block main %}
-<div class="container-fluid text-center">
-  {% if error %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error.messageKey|trans(error.messageData, 'security') }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+  <div class="container-fluid text-center">
+    {% if error %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ error.messageKey|trans(error.messageData, 'security') }}</strong>
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endif %}
+    {% for flashSuccess in app.flashes('verification') %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ flashSuccess }}</strong>
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+    {% for flashSuccess in app.flashes('password_changed') %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{ flashSuccess }}</strong>
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+    <form method="POST" action="{{path('login')}}" class="form-signin">
+      <h1 class="mb-3">Please sign in</h1>
+      <input type="email" name="_email" id="email" class="form-control" placeholder="Email address" value="{{last_username}}" required>
+      <input type="password" name="_password" id="password" class="form-control" placeholder="Password" required>
+      <div class="checkbox mb-3">
+        <label>
+          <input type="checkbox" name="_remember_me"> Remember me
+        </label>
+      </div>
+      <div class="mb-3">
+        <label>
+          <a href="{{path('forgot_password_request')}}">Password forgotten ?</a>
+        </label>
+      </div>
+      <input type="hidden" name="_csrf_token" value="{{csrf_token('authenticate')}}">
+      <div class="d-grid gap-2">
+        <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+      </div>
+      <p class="mt-5 mb-3 text-muted"><label>Solid'Ark ®</label> <a href="{{path('index')}}">main page</a></p>
+    </form>
   </div>
-  {% endif %}
-  {% for flashSuccess in app.flashes('verification') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  {% for flashSuccess in app.flashes('password_changed') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  <form method="POST" action="{{path('login')}}" class="form-signin">
-    <h1 class="mb-3">Please sign in</h1>
-    <input type="email" name="_email" id="email" class="form-control" placeholder="Email address" value="{{last_username}}" required>
-    <input type="password" name="_password" id="password" class="form-control" placeholder="Password" required>
-    <div class="checkbox mb-3">
-      <label>
-        <input type="checkbox" name="_remember_me"> Remember me
-      </label>
-    </div>
-    <div class="mb-3">
-      <label>
-        <a href="{{path('forgot_password_request')}}">Password forgotten ?</a>
-      </label>
-    </div>
-    <input type="hidden" name="_csrf_token" value="{{csrf_token('authenticate')}}">
-    <div class="d-grid gap-2">
-      <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
-    </div>
-    <p class="mt-5 mb-3 text-muted"><label>Solid'Ark ®</label> <a href="{{path('index')}}">main page</a></p>
-  </form>
-</div>
 {% endblock %}

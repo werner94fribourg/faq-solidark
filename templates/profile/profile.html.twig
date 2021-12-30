@@ -25,147 +25,149 @@
 {% else %}
   {% set addSkillAttempt = false %}
 {% endif %}
-  
+
 {% block title %}Profile page - {{user.username}}{% endblock %}
 
 {% block admintitle %}Profile page - {{user.username}}{% endblock %}
+
 {% block main %}
   {% for flashSuccess in app.flashes('verification') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('password_changed') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('change_password_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('photo_changed_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('photo_changed_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }} : <span id="change_profile_picture_form_profile_picture_error_error_displayed"></span></strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }} : <span id="change_profile_picture_form_profile_picture_error_error_displayed"></span></strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('change_name_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('change_name_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('change_occupation_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('change_occupation_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('change_CV_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('change_CV_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('add_skill_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('add_skill_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('delete_skill_success') %}
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    <strong>{{ flashSuccess }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {% for error in app.flashes('delete_skill_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ error }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
   {% endfor %}
   {{ parent() }}
 {% endblock %}
+
 {% block admincontent %}
-{% set user_role = '' %}
-{% for role in user.getRoles()%}
-  {% if role == 'ROLE_SUPERADMIN' %}
-    {% set user_role = 'Superadmin' %}
-  {% endif %}
-  {% if (role == 'ROLE_ADMIN') and (user_role != 'Superadmin') %}
-    {% set user_role = 'Admin' %}
-  {% endif %}
-  {% if (role == 'ROLE_USER') and (user_role != 'Admin') and (user_role != 'Superadmin') %}
-    {% set user_role = 'User' %}
-  {% endif %}
-{% endfor %}
-<div class="container emp-profile">
+  {% set user_role = '' %}
+  {% for role in user.getRoles()%}
+    {% if role == 'ROLE_SUPERADMIN' %}
+      {% set user_role = 'Superadmin' %}
+    {% endif %}
+    {% if (role == 'ROLE_ADMIN') and (user_role != 'Superadmin') %}
+      {% set user_role = 'Admin' %}
+    {% endif %}
+    {% if (role == 'ROLE_USER') and (user_role != 'Admin') and (user_role != 'Superadmin') %}
+      {% set user_role = 'User' %}
+    {% endif %}
+  {% endfor %}
+  <div class="container emp-profile">
     <div class="row">
       <div class="col-lg-4 col-md-12 order-1 order-lg-1">
         <div class="profile-img">
@@ -181,12 +183,8 @@
       </div>
       <div class="col-lg-6 col-md-12 order-3 order-lg-2">
         <div class="profile-head">
-          <h5>
-            {{user.username}}
-          </h5>
-          <h6>
-            {{user.occupation}}
-          </h6>
+          <h5>{{user.username}}</h5>
+          <h6>{{user.occupation}}</h6>
           <p class="profile-rating">RANKINGS : <span>8/10</span></p>
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -196,17 +194,17 @@
               <a class="nav-link" id="contributions-tab" data-bs-toggle="tab" data-bs-target="#contributions" role="tab" aria-controls="contributions" aria-selected="false">Contributions</a>
             </li>
             {% if is_granted('ROLE_ADMIN') and (user_role == 'Admin' or user_role == 'Superadmin') %}
-            <li class="nav-item">
-              <a class="nav-link" id="responsabilities-tab" data-bs-toggle="tab" data-bs-target="#responsabilities" role="tab" aria-controls="responsabilities" aria-selected="false">Responsabilities</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link" id="responsabilities-tab" data-bs-toggle="tab" data-bs-target="#responsabilities" role="tab" aria-controls="responsabilities" aria-selected="false">Responsabilities</a>
+              </li>
             {% endif %}
           </ul>
         </div>
       </div>
       <div class="col-lg-2 col-md-12 order-2 order-lg-3">
         {% if app.user and app.user.id == user.id %}
-        <input type="submit" id="change-password" class="profile-edit-btn" value="Modify Password">
-        <a href="{{path('modify_password')}}" id="change-password-link" hidden></a>
+          <input type="submit" id="change-password" class="profile-edit-btn" value="Modify Password">
+          <a href="{{path('modify_password')}}" id="change-password-link" hidden></a>
         {% endif %}
       </div>
     </div>
@@ -216,66 +214,66 @@
           <p>ABOUT ME</p>
           <span class="profile-work-item"><a href="{{path('show_cv', {'id': user.id})}}">CV</a>{% if app.user and app.user.id == user.id %}<a type="button" id="change_cv_form_button" class="profile-work-item-icon change-cv" data-bs-toggle="modal" data-bs-target="#change_cv_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</span><br>
           {% if app.user and app.user.id == user.id %}
-          <div class="modal fade" id="change_cv_form_modal" tabindex="-1" aria-labelledby="change_cv_form_button" aria-modal="true" role="dialog">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="modifyCVModalLabel">Modify CV</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  {{form_start(changeCVForm, {'attr': {'class': 'needs-validation', 'id':'change_cv_form'}})}}
-                    <div class="mb-3">
-                      <div class="form-group">
-                        {{form_widget(changeCVForm.CV, {'attr': {'class' : 'form-control-file'}})}}
-                        <div id="change_cv_form_CV_error" class="invalid-feedback">
-                          {{form_errors(changeCVForm.CV)}}
+            <div class="modal fade" id="change_cv_form_modal" tabindex="-1" aria-labelledby="change_cv_form_button" aria-modal="true" role="dialog">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modifyCVModalLabel">Modify CV</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {{form_start(changeCVForm, {'attr': {'class': 'needs-validation', 'id':'change_cv_form'}})}}
+                      <div class="mb-3">
+                        <div class="form-group">
+                          {{form_widget(changeCVForm.CV, {'attr': {'class' : 'form-control-file'}})}}
+                          <div id="change_cv_form_CV_error" class="invalid-feedback">
+                            {{form_errors(changeCVForm.CV)}}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  {{form_end(changeCVForm)}}
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" form="change_cv_form" class="btn btn-primary">Save changes</button>
+                    {{form_end(changeCVForm)}}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="change_cv_form" class="btn btn-primary">Save changes</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           {% endif %}
           <span class="profile-work-item"><a href="#">Personal website</a>{% if app.user and app.user.id == user.id %}<!--<a class="profile-work-item-icon change-website" href="#"><span class="glyphicon glyphicon-pencil"></span></a>-->{% endif %}</span><br>
           <span class="profile-work-item"><a href="#">LinkedIn profile</a>{% if app.user and app.user.id == user.id %}<!--<a class="profile-work-item-icon change-linkedin-profile" href="#"><span class="glyphicon glyphicon-pencil"></span></a>-->{% endif %}</span>
           <p>SKILLS</p>
           {% for skill in user.getUserSkills() %}
-          <span class="profile-work-item"><a href="{{path('skill', {'id': skill.id})}}">{{skill.name}}</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="{{path('delete_skill_user', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
+            <span class="profile-work-item"><a href="{{path('skill', {'id': skill.id})}}">{{skill.name}}</a>{% if app.user and app.user.id == user.id %}<a class="profile-work-item-icon delete-skill" href="{{path('delete_skill_user', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>{% endif %}</span><br>
           {% endfor %}
           {% if app.user and app.user.id == user.id %}
-          <span class="profile-work-item"><a type="button" id="add_skill_button" class="profile-work-item-icon add-skill" data-bs-toggle="modal" data-bs-target="#add_skill_modal"><span class="glyphicon glyphicon-plus"></span></a></span><br>
-          <div class="modal fade" id="add_skill_modal" tabindex="-1" aria-labelledby="add_skill_button" aria-modal="true" role="dialog">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="skillModalLabel">New skill</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  {{form_start(addSkillForm, {'attr': {'class': 'needs-validation', 'id': 'add_skill_form'}})}}
-                    <div class="mb-3">
-                      <label for="add_skill_skill" class="form-label">Skill</label>
-                      {{form_widget(addSkillForm.skill, {'attr': {'class': 'form-select'}})}}
-                      <div id="add_skill_skill_error" class="invalid-feedback">
+            <span class="profile-work-item"><a type="button" id="add_skill_button" class="profile-work-item-icon add-skill" data-bs-toggle="modal" data-bs-target="#add_skill_modal"><span class="glyphicon glyphicon-plus"></span></a></span><br>
+            <div class="modal fade" id="add_skill_modal" tabindex="-1" aria-labelledby="add_skill_button" aria-modal="true" role="dialog">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="skillModalLabel">New skill</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {{form_start(addSkillForm, {'attr': {'class': 'needs-validation', 'id': 'add_skill_form'}})}}
+                      <div class="mb-3">
+                        <label for="add_skill_skill" class="form-label">Skill</label>
+                        {{form_widget(addSkillForm.skill, {'attr': {'class': 'form-select'}})}}
+                        <div id="add_skill_skill_error" class="invalid-feedback">
                           {{form_errors(addSkillForm.skill)}}
+                        </div>
                       </div>
-                    </div>
-                  {{form_end(addSkillForm)}}
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" form="add_skill_form" class="btn btn-primary">Save changes</button>
+                    {{form_end(addSkillForm)}}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="add_skill_form" class="btn btn-primary">Save changes</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           {% endif %}
         </div>
       </div>
@@ -297,38 +295,38 @@
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <p>{{user.firstname}} {{user.lastname}}{% if app.user and app.user.id == user.id %}<a type="button" id="change_name_form_button" class="modify-name form-button" data-bs-toggle="modal" data-bs-target="#change_name_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
                 {% if app.user and app.user.id == user.id %}
-                <div class="modal fade" id="change_name_form_modal" tabindex="-1" aria-labelledby="change_name_form_button" aria-modal="true" role="dialog">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="questionModalLabel">Modify Name</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        {{form_start(changeNameForm, {'attr': {'class': 'needs-validation', 'id': 'change_name_form'}})}}
-                          <div class="mb-3">
-                            <label for="change_name_form_first_name" class="form-label">First Name</label>
-                            {{form_widget(changeNameForm.first_name, {'attr': {'class': 'form-control'}})}}
-                            <div id="change_name_form_first_name_error" class="invalid-feedback">
-                              {{form_errors(changeNameForm.first_name)}}
+                  <div class="modal fade" id="change_name_form_modal" tabindex="-1" aria-labelledby="change_name_form_button" aria-modal="true" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="questionModalLabel">Modify Name</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          {{form_start(changeNameForm, {'attr': {'class': 'needs-validation', 'id': 'change_name_form'}})}}
+                            <div class="mb-3">
+                              <label for="change_name_form_first_name" class="form-label">First Name</label>
+                              {{form_widget(changeNameForm.first_name, {'attr': {'class': 'form-control'}})}}
+                              <div id="change_name_form_first_name_error" class="invalid-feedback">
+                                {{form_errors(changeNameForm.first_name)}}
+                              </div>
                             </div>
-                          </div>
-                          <div class="mb-3">
-                            <label for="change_name_form_last_name" class="form-label">Last Name</label>
-                            {{form_widget(changeNameForm.last_name, {'attr': {'class': 'form-control'}})}}
-                            <div id="change_name_form_last_name_error" class="invalid-feedback">
-                              {{form_errors(changeNameForm.last_name)}}
+                            <div class="mb-3">
+                              <label for="change_name_form_last_name" class="form-label">Last Name</label>
+                              {{form_widget(changeNameForm.last_name, {'attr': {'class': 'form-control'}})}}
+                              <div id="change_name_form_last_name_error" class="invalid-feedback">
+                                {{form_errors(changeNameForm.last_name)}}
+                              </div>
                             </div>
-                          </div>
-                        {{form_end(changeNameForm)}}
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" form="change_name_form" class="btn btn-primary">Save changes</button>
+                          {{form_end(changeNameForm)}}
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" form="change_name_form" class="btn btn-primary">Save changes</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 {% endif %}
               </div>
             </div>
@@ -347,31 +345,31 @@
               <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
                 <p>{{user.occupation}}{% if app.user and app.user.id == user.id %}<a type="button" id="change_occupation_form_button" class="modify-occupation form-button" data-bs-toggle="modal" data-bs-target="#change_occupation_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>{% endif %}</p>
                 {% if app.user and app.user.id == user.id %}
-                <div class="modal fade" id="change_occupation_form_modal" tabindex="-1" aria-labelledby="change_occupation_form_button" aria-modal="true" role="dialog">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="questionModalLabel">Modify Occupation</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        {{form_start(changeOccupationForm, {'attr': {'class': 'needs-validation', 'id': 'change_occupation_form'}})}}
-                          <div class="mb-3">
-                            <label for="change_occupation_form_occupation" class="form-label">Occupation</label>
-                            {{form_widget(changeOccupationForm.occupation, {'attr': {'class': 'form-control'}})}}
-                            <div id="change_occupation_form_occupation_error" class="invalid-feedback">
-                              {{form_errors(changeOccupationForm.occupation)}}
+                  <div class="modal fade" id="change_occupation_form_modal" tabindex="-1" aria-labelledby="change_occupation_form_button" aria-modal="true" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="questionModalLabel">Modify Occupation</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          {{form_start(changeOccupationForm, {'attr': {'class': 'needs-validation', 'id': 'change_occupation_form'}})}}
+                            <div class="mb-3">
+                              <label for="change_occupation_form_occupation" class="form-label">Occupation</label>
+                              {{form_widget(changeOccupationForm.occupation, {'attr': {'class': 'form-control'}})}}
+                              <div id="change_occupation_form_occupation_error" class="invalid-feedback">
+                                {{form_errors(changeOccupationForm.occupation)}}
+                              </div>
                             </div>
-                          </div>
-                        {{form_end(changeOccupationForm)}}
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" form="change_occupation_form" class="btn btn-primary">Save changes</button>
+                          {{form_end(changeOccupationForm)}}
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" form="change_occupation_form" class="btn btn-primary">Save changes</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 {% endif %}
               </div>
             </div>
@@ -434,325 +432,44 @@
             <div class="row">
               <br>
             </div>
-            <!--<div class="row">
-              <div class="accordion" id="accordionProposedProjects">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headerAccordionProposedProjects">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneAccordionProposedProjects" aria-expanded="false" aria-controls="collapseOneAccordionProposedProjects">
-                      Proposed Projects
-                    </button>
-                  </h2>
-                  <div id="collapseOneAccordionProposedProjects" class="accordion-collapse collapse" aria-labelledby="headerAccordionProposedProjects" data-bs-parent="#accordionProposedProjects">
-                    <div class="accordion-body">
-                      <div class="row align-items-center pb-4">
-                        <div class="col-lg-3 pb-2">
-                          <h3>All Projects</h3>
-                        </div>
-                        <div class="vote-explanation col-lg-6 pb-2">
-                          <div class="vote-list">
-                            <div class="vote-list-yes"></div>
-                            <span>Yes</span>
-                            <div class="vote-list-no"></div>
-                            <span>No</span>
-                            <div class="vote-list-abstained"></div>
-                            <span>Abstained</span>
-                            <div class="vote-list-undecided"></div>
-                            <span>Undecided</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-3 pb-2">
-                          <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                            <option selected="">Newest</option>
-                            <option value="1">Votes</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-lg-12">
-                          <div class="table-responsive">
-                            <table class="table" id="proposedProjectsTable">
-                              <thead>
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Title</th>
-                                  <th scope="col">Type</th>
-                                  <th scope="col">Author</th>
-                                  <th scope="col">Status</th>
-                                  <th scope="col">Votes</th>
-                                  <th scope="col">Creation date</th>
-                                  <th scope="col">End date</th>
-                                  <th scope="col">Approbation date</th>
-                                  <th scope="col">Approver</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>Project 1</td>
-                                  <td>Technical</td>
-                                  <td>werner94fribourg</td>
-                                  <td>Approved</td>
-                                  <td>
-                                    <div>
-                                      <div class="vote-percentage-value">50.0%</div>
-                                      <div class="vote-percentage-display">
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td>21.05.2015</td>
-                                  <td>31.07.2016</td>
-                                  <td>06.12.2015</td>
-                                  <td>salim08</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <br>
-            </div>
-            <div class="row">
-              <div class="accordion" id="accordionMembershipProjects">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headerAccordionMembershipProjects">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneAccordionMembershipProjects" aria-expanded="true" aria-controls="collapseOneAccordionMembershipProjects">
-                      Project membership
-                    </button>
-                  </h2>
-                  <div id="collapseOneAccordionMembershipProjects" class="accordion-collapse collapse" aria-labelledby="headerAccordionMembershipProjects" data-bs-parent="#accordionMembershipProjects">
-                    <div class="accordion-body">
-                      <div class="row align-items-center pb-4">
-                        <div class="col-lg-3 pb-2">
-                          <h3>All Projects</h3>
-                        </div>
-                        <div class="vote-explanation col-lg-6 pb-2">
-                          <div class="vote-list">
-                            <div class="vote-list-yes"></div>
-                            <span>Yes</span>
-                            <div class="vote-list-no"></div>
-                            <span>No</span>
-                            <div class="vote-list-abstained"></div>
-                            <span>Abstained</span>
-                            <div class="vote-list-undecided"></div>
-                            <span>Undecided</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-3 pb-2">
-                          <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                            <option selected="">Newest</option>
-                            <option value="1">Votes</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-lg-12">
-                          <div class="table-responsive">
-                            <table class="table" id="projectMembershipTable">
-                              <thead>
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Title</th>
-                                  <th scope="col">Type</th>
-                                  <th scope="col">Author</th>
-                                  <th scope="col">Status</th>
-                                  <th scope="col">Votes</th>
-                                  <th scope="col">Creation date</th>
-                                  <th scope="col">End date</th>
-                                  <th scope="col">Approbation date</th>
-                                  <th scope="col">Approver</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>Project 1</td>
-                                  <td>Technical</td>
-                                  <td>werner94fribourg</td>
-                                  <td>Approved</td>
-                                  <td>
-                                    <div>
-                                      <div class="vote-percentage-value">50.0%</div>
-                                      <div class="vote-percentage-display">
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td>21.05.2015</td>
-                                  <td>31.07.2016</td>
-                                  <td>06.12.2015</td>
-                                  <td>salim08</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <br>
-            </div>
-            <div class="row">
-              <div class="accordion" id="accordionFinancedProjects">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headerAccordionFinancedProjects">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneAccordionFinancedProjects" aria-expanded="true" aria-controls="collapseOneAccordionFinancedProjects">
-                      Financed projects
-                    </button>
-                  </h2>
-                  <div id="collapseOneAccordionFinancedProjects" class="accordion-collapse collapse" aria-labelledby="headerAccordionFinancedProjects" data-bs-parent="#accordionFinancedProjects">
-                    <div class="accordion-body">
-                      <div class="row align-items-center pb-4">
-                        <div class="col-lg-3 pb-2">
-                          <h3>All Projects</h3>
-                        </div>
-                        <div class="vote-explanation col-lg-6 pb-2">
-                          <div class="vote-list">
-                            <div class="vote-list-yes"></div>
-                            <span>Yes</span>
-                            <div class="vote-list-no"></div>
-                            <span>No</span>
-                            <div class="vote-list-abstained"></div>
-                            <span>Abstained</span>
-                            <div class="vote-list-undecided"></div>
-                            <span>Undecided</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-3 pb-2">
-                          <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                            <option selected="">Newest</option>
-                            <option value="1">Votes</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-lg-12">
-                          <div class="table-responsive">
-                            <table class="table" id="financedProjectsTable">
-                              <thead>
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Title</th>
-                                  <th scope="col">Type</th>
-                                  <th scope="col">Author</th>
-                                  <th scope="col">Status</th>
-                                  <th scope="col">Votes</th>
-                                  <th scope="col">Creation date</th>
-                                  <th scope="col">End date</th>
-                                  <th scope="col">Approbation date</th>
-                                  <th scope="col">Approver</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>Project 1</td>
-                                  <td>Technical</td>
-                                  <td>werner94fribourg</td>
-                                  <td>Approved</td>
-                                  <td>
-                                    <div>
-                                      <div class="vote-percentage-value">50.0%</div>
-                                      <div class="vote-percentage-display">
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td>21.05.2015</td>
-                                  <td>31.07.2016</td>
-                                  <td>06.12.2015</td>
-                                  <td>salim08</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>-->
           </div>
           {% if is_granted('ROLE_ADMIN') and (user_role == 'Admin' or user_role == 'Superadmin') %}
-          <div class="tab-pane fade" id="responsabilities" role="tabpanel" aria-labelledby="responsabilities-tab">
-            <div class="row">
-              <div class="accordion" id="accordionModeratedFAQs">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headeraccordionModeratedFAQs">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneaccordionModeratedFAQs" aria-expanded="true" aria-controls="collapseOneaccordionModeratedFAQs">
-                      Moderated FAQs
-                    </button>
-                  </h2>
-                  <div id="collapseOneaccordionModeratedFAQs" class="accordion-collapse collapse" aria-labelledby="headeraccordionModeratedFAQs" data-bs-parent="#accordionModeratedFAQs">
-                    <div class="accordion-body">
-                      <div class="row align-items-center pb-4">
-                        <div class="col-lg-8 pb-2">
-                          <h3>All FAQs</h3>
+            <div class="tab-pane fade" id="responsabilities" role="tabpanel" aria-labelledby="responsabilities-tab">
+              <div class="row">
+                <div class="accordion" id="accordionModeratedFAQs">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="headeraccordionModeratedFAQs">
+                      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneaccordionModeratedFAQs" aria-expanded="true" aria-controls="collapseOneaccordionModeratedFAQs">
+                        Moderated FAQs
+                      </button>
+                    </h2>
+                    <div id="collapseOneaccordionModeratedFAQs" class="accordion-collapse collapse" aria-labelledby="headeraccordionModeratedFAQs" data-bs-parent="#accordionModeratedFAQs">
+                      <div class="accordion-body">
+                        <div class="row align-items-center pb-4">
+                          <div class="col-lg-8 pb-2">
+                            <h3>All FAQs</h3>
+                          </div>
+                          <div class="col-lg-4">
+                            <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
+                              <option selected="">Newest</option>
+                              <option value="1">Most Popular</option>
+                              <option value="2">Alphabetically</option>
+                            </select>
+                          </div>
                         </div>
-                        <div class="col-lg-4">
-                          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-                            <option selected="">Newest</option>
-                            <option value="1">Most Popular</option>
-                            <option value="2">Alphabetically</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="faq-list">
-                          <div class="media-card align-items-center">
-                            <div class="media-body">
-                              <div class="tags pb-1">
-                                <a href="#" class="tag-link tag-link-md tag-link-blue">FAQ 1</a>
-                              </div>
-                              <p class="card-text fs-14 truncate-4 lh-24">
-                                For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript). Please include all relevant tags on your question; e.g., [node.js],…
-                              </p>
-                              <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
-                                <p class="lh-18">2177849 questions, 901 asked today, 5319 this week</p>
+                        <div class="row">
+                          <div class="faq-list">
+                            <div class="media-card align-items-center">
+                              <div class="media-body">
+                                <div class="tags pb-1">
+                                  <a href="#" class="tag-link tag-link-md tag-link-blue">FAQ 1</a>
+                                </div>
+                                <p class="card-text fs-14 truncate-4 lh-24">
+                                  For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript). Please include all relevant tags on your question; e.g., [node.js],…
+                                </p>
+                                <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
+                                  <p class="lh-18">2177849 questions, 901 asked today, 5319 this week</p>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -762,157 +479,65 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <br>
-            </div>
-            <!--<div class="row">
-              <div class="accordion" id="accordionApprovedProjects">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headeraccordionApprovedProjects">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOneaccordionApprovedProjects" aria-expanded="true" aria-controls="collapseOneaccordionApprovedProjects">
-                      Approved projects
-                    </button>
-                  </h2>
-                  <div id="collapseOneaccordionApprovedProjects" class="accordion-collapse collapse" aria-labelledby="headeraccordionApprovedProjects" data-bs-parent="#accordionApprovedProjects">
-                    <div class="accordion-body">
-                      <div class="row align-items-center pb-4">
-                        <div class="col-lg-3 pb-2">
-                          <h3>All Projects</h3>
-                        </div>
-                        <div class="vote-explanation col-lg-6 pb-2">
-                          <div class="vote-list">
-                            <div class="vote-list-yes"></div>
-                            <span>Yes</span>
-                            <div class="vote-list-no"></div>
-                            <span>No</span>
-                            <div class="vote-list-abstained"></div>
-                            <span>Abstained</span>
-                            <div class="vote-list-undecided"></div>
-                            <span>Undecided</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-3 pb-2">
-                          <select class="form-select form-select-lg mb-3" aria-label=".form-select-lg example">
-                            <option selected="">Newest</option>
-                            <option value="1">Votes</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-lg-12">
-                          <div class="table-responsive">
-                            <table class="table" id="approvedProjectsTable">
-                              <thead>
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">Title</th>
-                                  <th scope="col">Type</th>
-                                  <th scope="col">Author</th>
-                                  <th scope="col">Status</th>
-                                  <th scope="col">Votes</th>
-                                  <th scope="col">Creation date</th>
-                                  <th scope="col">End date</th>
-                                  <th scope="col">Approbation date</th>
-                                  <th scope="col">Approver</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <th scope="row">1</th>
-                                  <td>Project 1</td>
-                                  <td>Technical</td>
-                                  <td>werner94fribourg</td>
-                                  <td>Approved</td>
-                                  <td>
-                                    <div>
-                                      <div class="vote-percentage-value">50.0%</div>
-                                      <div class="vote-percentage-display">
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-no"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-yes"></div>
-                                        <div class="vote-percentage-abstained"></div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td>21.05.2015</td>
-                                  <td>31.07.2016</td>
-                                  <td>06.12.2015</td>
-                                  <td>salim08</td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="row">
+                <br>
               </div>
-            </div>-->
-          </div>
+            </div>
           {% endif %}
         </div>
       </div>
     </div>
-  <div class="row">
-    <div class="col-lg-10"></div>
-    <div class="col-lg-2">
-    {% if app.user and app.user.id == user.id %}
-      <input type="button" id="delete-account" class="profile-edit-btn" value="Delete Account">
-      <a href="{{path('delete_account', {'id': user.id})}}" id="delete-account-link" hidden></a>
-    {% endif %}
+    <div class="row">
+      <div class="col-lg-10"></div>
+      <div class="col-lg-2">
+        {% if app.user and app.user.id == user.id %}
+          <input type="button" id="delete-account" class="profile-edit-btn" value="Delete Account">
+          <a href="{{path('delete_account', {'id': user.id})}}" id="delete-account-link" hidden></a>
+        {% endif %}
+      </div>
+    </div>
   </div>
-</div>
 {% endblock %}
 
 {% block customadminjavascripts %}
-<script>
-  {% if app.user and app.user.id == user.id %}
-    $('#profile_dropdown').addClass("active");
-    $('#my_profile_link').addClass("active");
-    $('#delete-account').on('click', function(e){
-      e.preventDefault();
-      alert('Are you sure ?');
-      $('#delete-account-link')[0].click();
-    });
-    $('#change-password').on('click', function(e){
-      e.preventDefault();
-      $('#change-password-link')[0].click();
-    });
-    {% if changePhotoAttempt %}
-      var errorText = $('#change_profile_picture_form_profile_picture_error_not_displayed').text();
-      $('#change_profile_picture_form_profile_picture_error_error_displayed').text(errorText);
+  <script>
+    {% if app.user and app.user.id == user.id %}
+      $('#profile_dropdown').addClass("active");
+      $('#my_profile_link').addClass("active");
+      $('#delete-account').on('click', function(e){
+        e.preventDefault();
+        alert('Are you sure ?');
+        $('#delete-account-link')[0].click();
+      });
+      $('#change-password').on('click', function(e){
+        e.preventDefault();
+        $('#change-password-link')[0].click();
+      });
+      {% if changePhotoAttempt %}
+        var errorText = $('#change_profile_picture_form_profile_picture_error_not_displayed').text();
+        $('#change_profile_picture_form_profile_picture_error_error_displayed').text(errorText);
+      {% endif %}
+      function submitPhotoForm(){
+        setTimeout(function(){
+          $('form[name=change_profile_picture_form]').submit();
+        }, 100);
+      }
+      {% if changeNameAttempt %}
+        document.getElementById("change_name_form").classList.add("was-validated");
+        $('#change_name_form_button')[0].click();
+      {% endif %}
+      {% if changeOccupationAttempt %}
+        document.getElementById("change_occupation_form").classList.add("was-validated");
+        $('#change_occupation_form_button')[0].click();
+      {% endif %}
+      {% if changeCVAttempt %}
+        document.getElementById("change_cv_form").classList.add("was-validated");
+        $('#change_cv_form_button')[0].click();
+      {% endif %}
+      {% if addSkillAttempt %}
+        document.getElementById("add_skill_form").classList.add("was-validated");
+        $('#add_skill_button')[0].click();
+      {% endif %}
     {% endif %}
-    function submitPhotoForm(){
-      setTimeout(function(){
-        $('form[name=change_profile_picture_form]').submit();
-      }, 100);
-    }
-    {% if changeNameAttempt %}
-      document.getElementById("change_name_form").classList.add("was-validated");
-      $('#change_name_form_button')[0].click();
-    {% endif %}
-    {% if changeOccupationAttempt %}
-      document.getElementById("change_occupation_form").classList.add("was-validated");
-      $('#change_occupation_form_button')[0].click();
-    {% endif %}
-    {% if changeCVAttempt %}
-      document.getElementById("change_cv_form").classList.add("was-validated");
-      $('#change_cv_form_button')[0].click();
-    {% endif %}
-    {% if addSkillAttempt %}
-      document.getElementById("add_skill_form").classList.add("was-validated");
-      $('#add_skill_button')[0].click();
-    {% endif %}
-  {% endif %}
-</script>
+  </script>
 {% endblock %}

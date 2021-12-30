@@ -2,23 +2,22 @@
 
 
 {% block customstylesheets %}
-<link rel="stylesheet" href="{{asset('build/css/profile.css')}}"/>
+  <link rel="stylesheet" href="{{asset('build/css/profile.css')}}"/>
 {% endblock %}
 
 {% block title %}Profile{% endblock %}
 
 {% block custombackground %}{% endblock %}
 
-{% block menu %}
-{% endblock %}
+{% block menu %}{% endblock %}
 
 {% block main %}{% endblock %}
 
 {% block footer %}{% endblock %}
 
 {% block customjavascripts %}
-{{parent()}}
-{% block customprofilejavascripts %}
-<script src="{{asset('build/js/profile.js')}}" type="text/javascript"></script>
-{% endblock %}
+  {{parent()}}
+  {% block customprofilejavascripts %}
+    <script src="{{asset('build/js/profile.js')}}" type="text/javascript"></script>
+  {% endblock %}
 {% endblock %}
