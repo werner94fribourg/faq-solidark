@@ -1,185 +1,438 @@
 {% extends 'admin/base.html.twig' %}
 
+{% if app.session.flashbag.peek('new_faq_error')|length > 0 or app.session.flashbag.peek('new_faq_success')|length > 0 %}
+  {% set newFaqAttempt = true %}
+{% else %}
+  {% set newFaqAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('new_faq_success')|length > 0 %}
+  {% set newFaqCreation = true %}
+{% else %}
+  {% set newFaqCreation = false %}
+{% endif %}
+{% if app.session.flashbag.peek('delete_faq_error')|length > 0 or app.session.flashbag.peek('delete_faq_success')|length > 0 %}
+  {% set deleteFaqAttempt = true %}
+{% else %}
+  {% set deleteFaqAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('moderator_error')|length > 0 or app.session.flashbag.peek('moderator_success')|length > 0 %}
+  {% set modifyModeratorAttempt = true %}
+{% else %}
+  {% set modifyModeratorAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('new_skill_error')|length > 0 or app.session.flashbag.peek('new_skill_success')|length > 0 %}
+  {% set newSkillAttempt = true %}
+{% else %}
+  {% set newSkillAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('new_skill_success')|length > 0 %}
+  {% set newSkillCreation = true %}
+{% else %}
+  {% set newSkillCreation = false %}
+{% endif %}
+{% if app.session.flashbag.peek('delete_skill_error')|length > 0 or app.session.flashbag.peek('delete_skill_success')|length > 0 %}
+  {% set deleteSkillAttempt = true %}
+{% else %}
+  {% set deleteSkillAttempt = false %}
+{% endif %}
+
 {% block title %}Admin management{% endblock %}
 
 {% block admintitle %}Admin management{% endblock %}
 
-{% block admincontent %}
+{% block main %}
+  {% for flashSuccess in app.flashes('account_deleted') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('change_role_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }} : <span id="set_user_rights_form_user_role_error_displayed"></span></strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('change_role_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('new_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('new_faq_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('moderator_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('moderator_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_faq_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('new_skill_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('new_skill_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_skill_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_skill_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_user_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
 
-<ul class="nav nav-faq justify-content-center mb-3">
-  <li class="nav-item">
-    <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="faqs-tab" data-bs-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" id="skills-tab" data-bs-toggle="tab" href="#skills" role="tab" aria-controls="skills" aria-selected="false">Skills</a>
-  </li>
-</ul>
-<div class="tab-content pt-40px" id="myTabContent">
-  <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
-    <div class="table-responsive">
-      <table class="table" id="users-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>First name</th>
-            <th>Last name</th>
-            <th>Occupation</th>
-            <th>Role</th>
-            <th>Profile link</th>
-            <th>Modify Role</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="userid-1">
-            <td>1</td>
-            <td>werner94@hotmail.com</td>
-            <td id="userid-1-username">werner94fribourg</td>
-            <td>Werner</td>
-            <td>Schmid</td>
-            <td>Informaticien</td>
-            <td>User</td>
-            <td><a href="#">Profile</a></td>
-            <td>
-              <form id="set_admin_rights" action="#" method="POST">
-                <select name="user_role" onchange="this.form.submit();">
-                  <option value="1">Admin</option>
-                  <option value="2" selected>User</option>
-                </select>
-              </form>
-            </td>
-            <td>
-              <a class="delete_user" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div><!-- end tab-pane -->
-  <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
-    <div class="table-responsive">
-      <table class="table" id="faqs-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>FAQ</th>
-            <th>Link</th>
-            <th>Moderator</th>
-            <th>Modify Moderator</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="moderatorid-1">
-            <td>1</td>
-            <td>FAQ 1</td>
-            <td><a href="#">FAQ</a></td>
-            <td>werner94fribourg</td>
-            <td>
-              <form id="set_moderator" action="#" method="POST">
-                <select name="moderator_list" onchange="this.form.submit();">
-                  <option value="1" selected>werner94fribourg</option>
-                  <option value="2">aimen06bern</option>
-                </select>
-              </form>
-            </td>
-            <td>
-              <a class="delete_faq" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="row mb-4">
-      <div class="col-lg-10"></div>
-      <div class="col-lg-2">
-        <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
+{% block admincontent %}
+  <ul class="nav nav-faq justify-content-center mb-3">
+    <li class="nav-item">
+      <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="faqs-tab" data-bs-toggle="tab" href="#faqs" role="tab" aria-controls="faqs" aria-selected="false">FAQs</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="skills-tab" data-bs-toggle="tab" href="#skills" role="tab" aria-controls="skills" aria-selected="false">Skills</a>
+    </li>
+  </ul>
+  <div class="tab-content pt-40px" id="myTabContent">
+    <div class="tab-pane fade active show" id="users" role="tabpanel" aria-labelledby="users-tab">
+      <div class="table-responsive">
+        <table class="table" id="users-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Email</th>
+              <th>Username</th>
+              <th>First name</th>
+              <th>Last name</th>
+              <th>Occupation</th>
+              <th>Role</th>
+              <th>Profile link</th>
+              <th>Modify Role</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+              {% set user_role = 'User' %}
+              {% for role in user.getRoles() %}
+                {% if role == 'ROLE_SUPERADMIN' %}
+                  {% set user_role = 'Superadmin' %}
+                {% elseif role == 'ROLE_ADMIN' and user_role != 'Superadmin' %}
+                  {% set user_role = 'Admin' %}
+                {% endif %}
+              {% endfor %}
+              <tr id="userid-{{user.id}}">
+                <td>{{loop.index}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.username}}</td>
+                <td>{{user.firstname}}</td>
+                <td>{{user.lastname}}</td>
+                <td>{{user.occupation}}</td>
+                <td>{{user_role}}</td>
+                <td><a href="{{path('profile', {'id': user.id})}}">Profile</a></td>
+                <td>
+                  {% if user_role != 'Superadmin' %}
+                    <select id="user_select_{{user.id}}" onchange="setUserRightsType({{user.id}});">
+                      <option value="0"{% if user_role == 'Admin' %} selected{% endif %}>Admin</option>
+                      <option value="1"{% if user_role == 'User' %}selected{% endif %}>User</option>
+                    </select>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if user_role != 'Superadmin' %}
+                    <a class="delete_user" href="{{path('delete_account', {'id': user.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {{form_start(adminRightsForm, {'attr': {'id': 'set_user_rights', 'style': 'display: none;'}})}}
+          {{form_widget(adminRightsForm.user_role)}}
+          <span id="change_profile_picture_form_profile_picture_error_not_displayed">{{form_errors(adminRightsForm.user_role)}}</span>
+          {{form_widget(adminRightsForm.user_id)}}
+        {{form_end(adminRightsForm)}}
       </div>
-    </div>
-    <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="faqModalLabel">New FAQ</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="faqForm" class="needs-validation" novalidate="">
-              <div class="mb-3">
-                <label for="title" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" required="">
-                <div id="name_error" class="invalid-feedback">Name error message.</div>
-              </div>
-              <div class="mb-3">
-                <label for="content" class="form-label">Moderator</label>
-                <input type="text" class="form-control" id="moderator" required="">
-                <div id="content_error" class="invalid-feedback">Moderator error message.</div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+    </div><!-- end tab-pane -->
+    <div class="tab-pane fade" id="faqs" role="tabpanel" aria-labelledby="faqs-tab">
+      <div class="table-responsive">
+        <table class="table" id="faqs-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>FAQ</th>
+              <th>Description</th>
+              <th>Faq link</th>
+              <th>Moderator</th>
+              <th>Modify Moderator</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for faq in faqs %}
+              <tr id="faqid-{{faq.id}}">
+                <td>{{loop.index}}</td>
+                <td>{{faq.name}}</td>
+                <td>{{faq.description}}</td>
+                <td><a href="{{path('faq', {'id': faq.id})}}">Link</a></td>
+                <td>{% if faq.moderator %}<a href="{{path('profile', {'id': faq.moderator.id})}}">{{faq.moderator.username}}</a>{% endif %}</td>
+                <td>
+                  <select id = "moderator_select_{{faq.id}}" onchange="setModerator({{faq.id}});">
+                    {% if not faq.moderator %}
+                      <option value="0" selected>Select a moderator</option>
+                      {% for adminUser in adminUsers %}
+                        <option value="{{adminUser.id}}">{{adminUser.username}}</option>
+                      {% endfor %}
+                    {% else %}
+                      {% for adminUser in adminUsers %}
+                        <option value="{{adminUser.id}}"{% if faq.moderator.id == adminUser.id %} selected{% endif %}>{{adminUser.username}}</option>
+                      {% endfor %}
+                    {% endif %}
+                  </select>
+                </td>
+                <td>
+                  <a class="delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {{form_start(faqModeratorForm, {'attr': {'id': 'faq_moderator_form', 'style': 'display: none;'}})}}
+          {{form_widget(faqModeratorForm.id)}}
+          {{form_widget(faqModeratorForm.moderator)}}
+        {{form_end(faqModeratorForm)}}
+      </div>
+      <div class="row mb-4">
+        <div class="col-lg-10"></div>
+        <div class="col-lg-2">
+          <a type="button" id="faq_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#faq_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+        </div>
+      </div>
+      <div class="modal fade" id="faq_form_modal" tabindex="-1" aria-labelledby="faq_form_button" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="faqModalLabel">New FAQ</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{form_start(faqForm, {'attr': {'class': 'needs-validation', 'id': 'faq_form'}})}}
+                <div class="mb-3">
+                  <label for="faq_form_name" class="form-label">Name</label>
+                  {{form_widget(faqForm.name, {'attr': {'class': 'form-control'}})}}
+                  <div id="faq_form_name_error" class="invalid-feedback">
+                    {{form_errors(faqForm.name)}}
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="faq_form_description" class="form-label">Description</label>
+                  {{form_widget(faqForm.description, {'attr': {'class': 'form-control'}})}}
+                  <div id="faq_form_description_error" class="invalid-feedback">
+                    {{form_errors(faqForm.description)}}
+                  </div>
+                </div>
+              {{form_end(faqForm)}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" form="faq_form" class="btn btn-primary">Save changes</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div><!-- end tab-pane -->
-  <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
-    <div class="table-responsive">
-      <table class="table" id="skills-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Skill</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr id="skillid-1">
-            <td>1</td>
-            <td>Skill 1</td>
-            <td>
-              <a class="delete_skill" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="row mb-4">
-      <div class="col-lg-10"></div>
-      <div class="col-lg-2">
-        <a type="button" id="skillButton" class="form-button" data-bs-toggle="modal" data-bs-target="#skillModal"><span class="glyphicon glyphicon-plus"></span></a>
+    </div><!-- end tab-pane -->
+    <div class="tab-pane fade" id="skills" role="tabpanel" aria-labelledby="skills-tab">
+      <div class="table-responsive">
+        <table class="table" id="skills-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Skill</th>
+              <th>Description</th>
+              <th>Number of users</th>
+              <th>Skill link</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for skill in skills %}
+              <tr id="skillid-{{skill.id}}">
+                <td>{{loop.index}}</td>
+                <td>{{skill.name}}</td>
+                <td>{{skill.description}}</td>
+                <td>{{skill.usersThatHasSkill|length}}</td>
+                <td><a href="{{path('skill', {'id': skill.id})}}">Link</a></td>
+                <td>
+                  <a class="delete_skill" href="{{path('delete_skill', {'id': skill.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
-    </div>
-    <div class="modal fade" id="skillModal" tabindex="-1" aria-labelledby="skillButton" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="questionModalLabel">New skill</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <form id="skillForm" class="needs-validation" novalidate>
-              <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" required />
-                <div id="title_error" class="invalid-feedback">Name error message.</div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" form="skillForm" class="btn btn-primary">Save changes</button>
+      <div class="row mb-4">
+        <div class="col-lg-10"></div>
+        <div class="col-lg-2">
+          <a type="button" id="skill_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#skill_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+        </div>
+      </div>
+      <div class="modal fade" id="skill_form_modal" tabindex="-1" aria-labelledby="skill_form_button" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="skillModalLabel">New skill</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{form_start(skillForm, {'attr': {'class' : 'needs-validation', 'id': 'skill_form'}})}}
+                <div class="mb-3">
+                  <label for="skill_form_name" class="form-label">Name</label>
+                  {{form_widget(skillForm.name, {'attr': {'class': 'form-control'}})}}
+                  <div id="skill_form_name_error" class="invalid-feedback">
+                    {{form_errors(skillForm.name)}}
+                  </div>
+                  <label for="skill_form_description" class="form-label">Description</label>
+                  {{form_widget(skillForm.description, {'attr': {'class': 'form-control'}})}}
+                  <div id="skill_form_description_error" class="invalid-feedback">
+                    {{form_errors(skillForm.description)}}
+                  </div>
+                </div>
+              {{form_end(skillForm)}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" form="skill_form" class="btn btn-primary">Save changes</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div><!-- end tab-pane -->
-</div><!-- end tab-content -->
+    </div><!-- end tab-pane -->
+  </div><!-- end tab-content -->
+{% endblock %}
+
+{% block customadminjavascripts %}
+  {{parent()}}
+  <script>
+    $('#admin_manager_link').addClass('active');
+    $('.delete_user').on('click', function(e){
+      e.preventDefault();
+      alert('Are you sure ?');
+      var href = $(this).attr('href');
+      window.location.href = href;
+    });
+
+    function setUserRightsType(user_id)
+    {
+      var selector = '#user_select_'+user_id;
+      var roleValue = $(selector).val();
+      $('#set_user_rights_user_id').val(user_id);
+      $('#set_user_rights_user_role').val(roleValue);
+      setTimeout(function(){
+        $('#set_user_rights').submit();
+      }, 100);
+    }
+
+    function setModerator(faq_id)
+    {
+      var selector = '#moderator_select_'+faq_id;
+      var moderatorValue = $(selector).val();
+      $('#faq_moderator_form_id').val(faq_id);
+      $('#faq_moderator_form_moderator').val(moderatorValue);
+      setTimeout(function(){
+        $('#faq_moderator_form').submit()
+      }, 100);
+    }
+
+    var errorText = $('#set_user_rights_form_user_role_error_not_displayed').text();
+    $('#set_user_rights_form_user_role_error_displayed').text(errorText);
+    {% if newFaqAttempt or deleteFaqAttempt or modifyModeratorAttempt %}
+      $('#faqs-tab')[0].click();
+    {% endif %}
+    {% if (not newFaqCreation) and newFaqAttempt %}
+      document.getElementById("faq_form").classList.add("was-validated");
+      $('#faq_form_button')[0].click();
+    {% endif %}
+    {% if newSkillAttempt or deleteSkillAttempt %}
+      $('#skills-tab')[0].click();
+    {% endif %}
+    {% if (not newSkillCreation) and newSkillAttempt %}
+      document.getElementById("skill_form").classList.add("was-validated");
+      $("#skill_form_button")[0].click();
+    {% endif %}
+  </script>
 {% endblock %}

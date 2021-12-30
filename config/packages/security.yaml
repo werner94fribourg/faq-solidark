@@ -47,10 +47,11 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-         - { path: ^/admin, roles: ROLE_ADMIN }
-         - {path: ^/(register|login), roles: IS_ANONYMOUS}
-         - {path: /my-profile, roles: IS_AUTHENTICATED_REMEMBERED}
-         - {path: /delete-account, roles: IS_AUTHENTICATED_FULLY}
-         - {path: /modify-password, roles: IS_AUTHENTICATED_FULLY}
+         - { path: ^/admin, roles: ROLE_SUPERADMIN }
+         - { path: ^/(register|login), roles: IS_ANONYMOUS }
+         - { path: /my-profile, roles: IS_AUTHENTICATED_FULLY }
+         - { path: /delete-account, roles: IS_AUTHENTICATED_FULLY }
+         - { path: ^/delete-skill, roles: IS_AUTHENTICATED_FULLY }
+         - { path: /modify-password, roles: IS_AUTHENTICATED_FULLY }
         # - { path: ^/profile, roles: ROLE_USER }
     access_denied_url: /access-denied

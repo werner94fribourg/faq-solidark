@@ -1,0 +1,177 @@
+{% extends 'faq/base.html.twig' %}
+
+{% if app.session.flashbag.peek('modify_faq_error')|length > 0 %}
+  {% set modifyFAQAttempt = true %}
+{% else %}
+  {% set modifyFAQAttempt = false %}
+{% endif %}
+
+{% block title %}FAQ page - {{faq.name}}{% endblock %}
+
+{% block main %}
+  {% for flashSuccess in app.flashes('modify_faq_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
+
+{% block faqcontent %}
+  <div class="row">
+    <div class="media-card align-items-center">
+      <div class="media-body">
+        <div class="tags pb-1">
+          <a href="#" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
+        </div>
+        <p class="card-text fs-14 truncate-4 lh-24">
+          {{faq.description}}
+        </p>
+        <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
+          <p class="lh-18">{{faq.relatedQuestions|length}} questions, {{todayQuestions|length}} asked today, {{weeklyQuestions|length}} this week</p>
+        </div>
+        {% if is_granted('ROLE_SUPERADMIN') %}
+          <div class="row mb-4">
+            <div class="col-lg-10"></div>
+            <div class="col-lg-2">
+              <a class="form-button delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              <a type="button" id="faq_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#faq_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>
+              <div class="modal fade" id="faq_form_modal" tabindex="-1" aria-labelledby="faq_form_button" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="faq_form_label">Modify FAQ</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      {{form_start(faqForm, {'attr': {'class': 'needs-validation', 'id': 'faq_form'}})}}
+                        <div class="mb-3">
+                          <label for="faq_form_name" class="form-label">Name</label>
+                          {{form_widget(faqForm.name, {'attr': {'class': 'form-control'}})}}
+                          <div id="faq_form_name_error" class="invalid-feedback">
+                            {{form_errors(faqForm.name)}}
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="faq_form_description" class="form-label">Description</label>
+                          {{form_widget(faqForm.description, {'attr': {'class': 'form-control', 'rows': '4'}})}}
+                          <div id="faq_form_description_error" class="invalid-feedback">
+                            {{form_errors(faqForm.description)}}
+                          </div>
+                        </div>
+                      {{form_end(faqForm)}}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" form="faq_form" class="btn btn-primary">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4 mt-2">
+    <div class="col-lg-10">
+      <h5 class="h3">Related Questions</h5>
+    </div>
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      <div class="col-lg-2">
+        <a type="button" id="answerButton" class="form-button" data-bs-toggle="modal" data-bs-target="#answerModal"><span class="glyphicon glyphicon-plus"></span></a>
+        <div class="modal fade" id="answerModal" tabindex="-1" aria-labelledby="answerButton" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New answer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="answerForm" class="register-form needs-validation" novalidate>
+                  <div class="mb-3">
+                    <label for="content" class="form-label">Content</label>
+                    <textarea class="form-control" id="content" rows="4" required></textarea>
+                    <div id="content_error" class="invalid-feedback">Content error message.</div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="answerForm" class="btn btn-primary">Save changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+  <hr>
+  <div class="question-list">
+    {% for question in faq.relatedQuestions %}
+      <div id="question-{{question.id}}" class="row">
+        <div class="media-card align-items-center">
+          <div class="votes">
+            <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+              {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
+              {% if votes_count >= 0 %}
+                <span class="vote-counts up">{{votes_count}}</span>
+                <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+              {% else %}
+                <span class="vote-counts down">{{votes_count}}</span>
+                <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+              {% endif %}
+            </div>
+            <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+              <span class="vote-counts">{{question.answers|length}}</span>
+              <span class="answer-icon"></span>
+            </div>
+          </div>
+          <div class="media-body">
+            <h5><a href="#">{{question.title}}</a></h5>
+            <small class="meta">
+              <span class="pr-1">{{question.creationDate|ago}}</span>
+              <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
+            </small>
+            <div class="tags">
+              {% for belongingFaq in question.belongingFAQs %}
+                <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+              {% endfor %}
+            </div>
+            {% if is_granted('ROLE_SUPERADMIN') %}
+              <hr>
+              <div class="row mb-4">
+                <div class="col-lg-10"></div>
+                <div class="col-lg-2">
+                  <a class="form-button delete_questions" href="#" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    {% if modifyFAQAttempt %}
+      document.getElementById("faq_form").classList.add("was-validated");
+      $("#faq_form_button")[0].click();
+    {% endif %}
+  </script>
+{% endblock %}

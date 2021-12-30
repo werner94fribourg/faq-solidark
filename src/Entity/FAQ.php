@@ -86,8 +86,10 @@ class FAQ
 
     public function setModerator(?User $moderator): self
     {
-        $this->moderator = $moderator;
-
+        if($moderator == null || in_array('ROLE_ADMIN', $moderator->getRoles(), true))
+        {
+            $this->moderator = $moderator;
+        }
         return $this;
     }
 

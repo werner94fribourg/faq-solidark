@@ -24,6 +24,7 @@ class UserFixtures extends Fixture
     }
     public function load(ObjectManager $manager): void
     {
+        $this->filesystem->remove(['public/uploads']);
         $id = 1;
         foreach($this->getUserData() as [$email, $roles, $password, $username, $last_name, $first_name, $occupation, $profilePicture, $CV])
         {

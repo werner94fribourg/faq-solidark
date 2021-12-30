@@ -15,7 +15,10 @@ class MainController extends AbstractController
     public function index($deleteAccount = 0): Response
     {
         if($deleteAccount == 1)
+        {
             $this->addFlash('delete_account', 'Your account has been removed');
+            return $this->redirectToRoute('index');
+        }
         return $this->render('base.html.twig', [
 
         ]);

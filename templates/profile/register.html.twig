@@ -3,142 +3,131 @@
 {% block title %}Register{% endblock %}
 
 {% block main %}
-<div class="container-fluid text-center">
-  {% for flashError in app.flashes('verify_email_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ flashError }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  {% for flashError in app.flashes('submission_error') %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    <strong>{{ flashError }}</strong>
-    <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  {% endfor %}
-  {{ form_start(form, {'attr': {'class': 'form-signin needs-validation', 'id': 'registration_form'}})}}
-  {#<form method="POST" action="#" class="form-signin">#}
-  <h1 class="mb-3">User Registration</h1>
-  <div class = "tab">
-    <div class="mb-3">
-      {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Email address'}}) }}
-      {#<input type="email" class="form-control" placeholder="Email address">#}
-      <div id="email_error" class="invalid-feedback">
-        {{ form_errors(form.email) }}
+  <div class="container-fluid text-center">
+    {% for flashError in app.flashes('verify_email_error') %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ flashError }}</strong>
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-    </div>
-    <div class="mb-3">
-      {{ form_widget(form.password.first, {'attr': {'class': 'form-control', 'placeholder': 'Password'}}) }}
-      {#<input type="password" class="form-control" placeholder="Password">#}
-      <div id="password_first_error" class="invalid-feedback">
-        {{ form_errors(form.password.first)}}
+    {% endfor %}
+    {% for flashError in app.flashes('submission_error') %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>{{ flashError }}</strong>
+        <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-    </div>
-    <div class="mb-3">
-      {{ form_widget(form.password.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirm Password'}}) }}
-      {#<input type="password" class="form-control" placeholder="Confirm Password">#}
-      <div id="password_second_error" class="invalid-feedback">
-        {{ form_errors(form.password.second)}}
-      </div>
-    </div>
-  </div>
-  <div class="tab">
-    <div class="mb-3">
-      {{ form_widget(form.username, {'attr': {'class': 'form-control', 'placeholder': 'Username'}}) }}
-      {#<input type="text" class="form-control" id="username" placeholder="Username">#}
-      <div id="username_error" class="invalid-feedback">
-        {{form_errors(form.username)}}
-      </div>
-    </div>
-    <div class="mb-3">
-      {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'placeholder': 'First Name'}}) }}
-      {#<input type="text" class="form-control" placeholder="First Name">#}
-      <div id="first_name_error" class="invalid-feedback">
-        {{form_errors(form.first_name)}}
-      </div>
-    </div>
-    <div class="mb-3">
-      {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'placeholder': 'Last Name'}}) }}
-      {#<input type="text" class="form-control" placeholder="Last Name">#}
-      <div id="last_name_error" class="invalid-feedback">
-        {{form_errors(form.last_name)}}
-      </div>
-    </div>
-  </div>
-  <div class="tab">
-    <div class="mb-3">
-      {{ form_widget(form.occupation, {'attr': {'class': 'form-control', 'placeholder': 'Occupation'}}) }}
-      {#<input type="text" class="form-control" placeholder="Occupation">#}
-      <div id="occupation_error" class="invalid-feedback">
-        {{form_errors(form.occupation)}}
-      </div>
-    </div>
-    <div class="mb-3">
-      <div class="form-group">
-        {{ form_widget(form.profile_picture, {'attr': {'class': 'form-control-file'}}) }}
-        {#<input type="file" class="form-control-file">#}
-        <label class="custom-file-label" for="photo">Choose a photo (.png/.jpeg)</label>
-        <div id="photo_error" class="invalid-feedback">
-          {{form_errors(form.profile_picture)}}
+    {% endfor %}
+    {{ form_start(form, {'attr': {'class': 'form-signin needs-validation', 'id': 'registration_form'}})}}
+      <h1 class="mb-3">User Registration</h1>
+      <div class = "tab">
+        <div class="mb-3">
+          {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'Email address'}}) }}
+          <div id="email_error" class="invalid-feedback">
+            {{ form_errors(form.email) }}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form_widget(form.password.first, {'attr': {'class': 'form-control', 'placeholder': 'Password'}}) }}
+          <div id="password_first_error" class="invalid-feedback">
+            {{ form_errors(form.password.first)}}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form_widget(form.password.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirm Password'}}) }}
+          <div id="password_second_error" class="invalid-feedback">
+            {{ form_errors(form.password.second)}}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="mb-3">
-      <div class="form-group">
-        {{ form_widget(form.CV, {'attr': {'class': 'form-control-file'}}) }}
-        {#<input type="file" class="form-control-file">#}
-        <label class="custom-file-label" for="cv">Choose a CV (.pdf)</label>
-        <div id="cv_error" class="invalid-feedback">
-          {{form_errors(form.CV)}}
+      <div class="tab">
+        <div class="mb-3">
+          {{ form_widget(form.username, {'attr': {'class': 'form-control', 'placeholder': 'Username'}}) }}
+          <div id="username_error" class="invalid-feedback">
+            {{form_errors(form.username)}}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form_widget(form.first_name, {'attr': {'class': 'form-control', 'placeholder': 'First Name'}}) }}
+          <div id="first_name_error" class="invalid-feedback">
+            {{form_errors(form.first_name)}}
+          </div>
+        </div>
+        <div class="mb-3">
+          {{ form_widget(form.last_name, {'attr': {'class': 'form-control', 'placeholder': 'Last Name'}}) }}
+          <div id="last_name_error" class="invalid-feedback">
+            {{form_errors(form.last_name)}}
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div class="tab">
-    <div class="checkbox mb-3">
-      <label>
-        {{ form_widget(form.agreeTerms) }}{#<input type="checkbox" name="_agreeTerms">#} Click here to agree to our utilisation terms
-        <div id="terms_error" class="invalid-feedback">
-          {{form_errors(form.agreeTerms)}}
+      <div class="tab">
+        <div class="mb-3">
+          {{ form_widget(form.occupation, {'attr': {'class': 'form-control', 'placeholder': 'Occupation'}}) }}
+          <div id="occupation_error" class="invalid-feedback">
+            {{form_errors(form.occupation)}}
+          </div>
         </div>
-      </label>
-    </div>
-  </div>
-  <hr>
-  <div class="gap-2">
-    <div class="row">
-      <div class="d-grid col-lg-6 mb-2">
-        <button type="button" id="prevBtn" class="btn btn-primary multistep-button" onclick="nextPrev(-1)">Previous</button>
+        <div class="mb-3">
+          <div class="form-group">
+            {{ form_widget(form.profile_picture, {'attr': {'class': 'form-control-file'}}) }}
+            <label class="custom-file-label" for="photo">Choose a photo (.png/.jpeg)</label>
+            <div id="photo_error" class="invalid-feedback">
+              {{form_errors(form.profile_picture)}}
+            </div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <div class="form-group">
+            {{ form_widget(form.CV, {'attr': {'class': 'form-control-file'}}) }}
+            <label class="custom-file-label" for="cv">Choose a CV (.pdf)</label>
+            <div id="cv_error" class="invalid-feedback">
+              {{form_errors(form.CV)}}
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="d-grid col-lg-6 mb-2">
-        <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Next</button>
+      <div class="tab">
+        <div class="checkbox mb-3">
+          <label>
+            {{ form_widget(form.agreeTerms) }}{#<input type="checkbox" name="_agreeTerms">#} Click here to agree to our utilisation terms
+            <div id="terms_error" class="invalid-feedback">
+              {{form_errors(form.agreeTerms)}}
+            </div>
+          </label>
+        </div>
       </div>
-    </div>
-    <div class="step-elements mb-2">
-      <span class="step"></span>
-      <span class="step"></span>
-      <span class="step"></span>
-      <span class="step"></span>
-    </div>
+      <hr>
+      <div class="gap-2">
+        <div class="row">
+          <div class="d-grid col-lg-6 mb-2">
+            <button type="button" id="prevBtn" class="btn btn-primary multistep-button" onclick="nextPrev(-1)">Previous</button>
+          </div>
+          <div class="d-grid col-lg-6 mb-2">
+            <button type="button" id="nextBtn" class="btn btn-primary" onclick="nextPrev(1)">Next</button>
+          </div>
+        </div>
+        <div class="step-elements mb-2">
+          <span class="step"></span>
+          <span class="step"></span>
+          <span class="step"></span>
+          <span class="step"></span>
+        </div>
+      </div>
+      <p class="mt-5 mb-3 text-muted"><label>Solid'Ark ®</label> <a href="{{path('index')}}">main page</a></p>
+    {{ form_end(form) }}
   </div>
-  <p class="mt-5 mb-3 text-muted"><label>Solid'Ark ®</label> <a href="{{path('index')}}">main page</a></p>
-  {{ form_end(form) }}
-  {#</form>#}
-</div>
 {% endblock %}
 
-{% block customjavascripts %}
-{{parent()}}
-<script type="text/javascript">
-  var currentTab = 0; // Current tab is set to be the first tab (0)
-  showTab(currentTab);
-  {% if validated %}
-  var z= document.getElementsByName("registration_form")[0];
-  z.classList.add("was-validated");
-  {% endif %}
-</script>
+{% block customprofilejavascripts %}
+  {{parent()}}
+  <script type="text/javascript">
+    var currentTab = 0; // Current tab is set to be the first tab (0)
+    showTab(currentTab);
+    {% if validated %}
+      var z= document.getElementsByName("registration_form")[0];
+      z.classList.add("was-validated");
+    {% endif %}
+  </script>
 {% endblock %}
