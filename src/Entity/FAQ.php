@@ -41,6 +41,7 @@ class FAQ
 
     /**
      * @ORM\ManyToMany(targetEntity=Question::class, mappedBy="belongingFAQs")
+     * @ORM\OrderBy({"creationDate" = "DESC"})
      * @ORM\JoinTable(name="questions_belongings")
      */
     private $relatedQuestions;

@@ -41,6 +41,11 @@ class Answer
     private $editor;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    private $creationDate;
+
+    /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedAnswers")
      * @ORM\JoinTable(name="answers_likes")
      */
@@ -74,7 +79,7 @@ class Answer
 
         return $this;
     }
-
+    
     public function getRelatedQuestion(): ?Question
     {
         return $this->relatedQuestion;
@@ -95,6 +100,18 @@ class Answer
     public function setEditor(?User $editor): self
     {
         $this->editor = $editor;
+
+        return $this;
+    }
+
+    public function getCreationDate(): ?\DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(\DateTimeInterface $creationDate): self
+    {
+        $this->creationDate = $creationDate;
 
         return $this;
     }

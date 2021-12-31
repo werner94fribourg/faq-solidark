@@ -49,128 +49,11 @@
   </ul>
   <div class="tab-content pt-40px" id="myTabContent">
     <div class="tab-pane fade active show" id="questions" role="tabpanel" aria-labelledby="questions-tab">
-      <div class="row project-search">
-        <div class="col-lg-9 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search question">
-        </div>
-        <div class="col-lg-3 mb-3">
-          <a class="btn theme-btn" data-bs-toggle="collapse" href="#collapseSearchAdvanced" role="button" aria-expanded="true" aria-controls="collapseSearchAdvanced">
-            <i class="la la-gear mr-1"></i> Filters
-          </a>
-        </div>
-        <div class="col-lg-12 mb-3 collapse" id="collapseSearchAdvanced" style="">
-          <div class="search-advanced-item mb-10px">
-            <form>
-              <h4 class="fs-14 pb-2 text-gray text-uppercase">Attributes</h4>
-              <div class="divider"><span></span></div>
-              <div class="pt-3">
-                <div class="row">
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="author">Author</label>
-                    <input id="author" type="text" class="form-control mb-3" name="author">
-                  </div>
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="type">FAQ</label>
-                    <select id="type" class="form-select mb-3" name="type">
-                      <option selected="" value="0">FAQ 0</option>
-                      <option value="1">FAQ 1</option>
-                      <option value="2">FAQ 2</option>
-                      <option value="3">FAQ 3</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div><!-- end search-advanced-item -->
-        </div>
-      </div>
-      <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
-          <h3>All Questions</h3>
-        </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option selected="">Newest</option>
-            <option value="1">Votes</option>
-            <option value="2">Unanswered</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="question-list col-lg-12">
-          {% for question in questions %}
-            <div id="question-{{question.id}}" class="media-card align-items-center">
-              <div class="votes">
-                <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-                  {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
-                  {% if votes_count >= 0 %}
-                    <span class="vote-counts up ">{{votes_count}}</span>
-                    <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
-                  {% else %}
-                    <span class="vote-counts down">{{votes_count|abs}}</span>
-                    <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
-                  {% endif %}
-                </div>
-                <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-                  <span class="vote-counts">{{question.answers|length}}</span>
-                  <span class="answer-icon"></span>
-                </div>
-              </div>
-              <div class="media-body">
-                <h5><a href="#">{{question.title}}</a></h5>
-                <small class="meta">
-                  <span class="pr-1">{{question.creationDate|ago}}</span>
-                  <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
-                </small>
-                <div class="tags">
-                  {% for belongingFaq in question.belongingFAQs %}
-                    <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
-                  {% endfor %}
-                </div>
-                {% if is_granted('ROLE_SUPERADMIN') %}
-                  <hr>
-                  <div class="row mb-4">
-                    <div class="col-lg-8"></div>
-                    <div class="col-lg-4 mb-2">
-                      <a id="questionDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-                      <button type="button" id="assignFaqButton" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assignFaqModal">FAQ</button>
-                      <div class="modal fade" id="assignFaqModal" tabindex="-1" aria-labelledby="assignFaqButton" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="questionModalLabel">New Assignment</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              <form id="faqForm" class="needs-validation" novalidate>
-                                <div class="mb-3">
-                                  <label for="assignment" class="form-label">Assignment</label>
-                                  <select id="assignment" class="form-select">
-                                    <option selected value="1">FAQ 1</option>
-                                    <option value="2">FAQ 2</option>
-                                    <option value="3">FAQ 3</option>
-                                  </select>
-                                </div>
-                              </form>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
       {% if is_granted('ROLE_USER') %}
         <div class="row mb-4">
-          <div class="col-lg-10"></div>
+          <div class="col-lg-10">
+            <h3>Ask Question</h3>
+          </div>
           <div class="col-lg-2">
             <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
             <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" aria-hidden="true">
@@ -223,7 +106,128 @@
             </div>
           </div>
         </div>
+        <hr>
       {% endif %}
+      <div class="row project-search">
+        <div class="col-lg-9 mb-3">
+          <input type="text" class="form-control search-input" placeholder="Search question">
+        </div>
+        <div class="col-lg-3 mb-3">
+          <a class="btn theme-btn" data-bs-toggle="collapse" href="#collapseSearchAdvanced" role="button" aria-expanded="true" aria-controls="collapseSearchAdvanced">
+            <i class="la la-gear mr-1"></i> Filters
+          </a>
+        </div>
+        <div class="col-lg-12 mb-3 collapse" id="collapseSearchAdvanced" style="">
+          <div class="search-advanced-item mb-10px">
+            <form>
+              <h4 class="fs-14 pb-2 text-gray text-uppercase">Attributes</h4>
+              <div class="divider"><span></span></div>
+              <div class="pt-3">
+                <div class="row">
+                  <div class="input-box col-lg-6 mb-3">
+                    <label class="form-label fs-13 text-black lh-20 mb-3" for="author">Author</label>
+                    <input id="author" type="text" class="form-control mb-3" name="author">
+                  </div>
+                  <div class="input-box col-lg-6 mb-3">
+                    <label class="form-label fs-13 text-black lh-20 mb-3" for="type">FAQ</label>
+                    <select id="type" class="form-select mb-3" name="type">
+                      <option selected="" value="0">FAQ 0</option>
+                      <option value="1">FAQ 1</option>
+                      <option value="2">FAQ 2</option>
+                      <option value="3">FAQ 3</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div><!-- end search-advanced-item -->
+        </div>
+      </div>
+      <hr>
+      <div class="row align-items-center pb-4">
+        <div class="col-lg-8 pb-2">
+          <h3>All Questions</h3>
+        </div>
+        <div class="col-lg-4">
+          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
+            <option selected="">Newest</option>
+            <option value="1">Votes</option>
+            <option value="2">Unanswered</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="question-list col-lg-12">
+          {% for question in questions %}
+            <div id="question-{{question.id}}" class="media-card align-items-center">
+              <div class="votes">
+                <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+                  {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
+                  {% if votes_count >= 0 %}
+                    <span class="vote-counts up ">{{votes_count}}</span>
+                    <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+                  {% else %}
+                    <span class="vote-counts down">{{votes_count|abs}}</span>
+                    <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+                  {% endif %}
+                </div>
+                <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+                  <span class="vote-counts">{{question.answers|length}}</span>
+                  <span class="answer-icon"></span>
+                </div>
+              </div>
+              <div class="media-body">
+                <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
+                <small class="meta">
+                  <span class="pr-1">{{question.creationDate|ago}}</span>
+                  <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
+                </small>
+                <div class="tags">
+                  {% for belongingFaq in question.belongingFAQs %}
+                    <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+                  {% endfor %}
+                </div>
+                {% if is_granted('ROLE_SUPERADMIN') %}
+                  <hr>
+                  <div class="row mb-4">
+                    <div class="col-lg-8"></div>
+                    <div class="col-lg-4 mb-2">
+                      <a id="questionDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
+                      <button type="button" id="assignFaqButton" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assignFaqModal">FAQ</button>
+                      <div class="modal fade" id="assignFaqModal" tabindex="-1" aria-labelledby="assignFaqButton" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="questionModalLabel">New Assignment</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form id="faqForm" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                  <label for="assignment" class="form-label">Assignment</label>
+                                  <select id="assignment" class="form-select">
+                                    <option selected value="1">FAQ 1</option>
+                                    <option value="2">FAQ 2</option>
+                                    <option value="3">FAQ 3</option>
+                                  </select>
+                                </div>
+                              </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
       <div class="row">
         <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
           <div class="pager question-paginator">

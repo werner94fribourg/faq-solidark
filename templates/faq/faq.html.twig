@@ -140,7 +140,7 @@
             </div>
           </div>
           <div class="media-body">
-            <h5><a href="#">{{question.title}}</a></h5>
+            <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
             <small class="meta">
               <span class="pr-1">{{question.creationDate|ago}}</span>
               <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>

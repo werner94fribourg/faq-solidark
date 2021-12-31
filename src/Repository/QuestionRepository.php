@@ -27,7 +27,7 @@ class QuestionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('q')
             ->andWhere('q.creationDate >= :date')
             ->setParameter('date', $date->format('y-m-d 00:00:00'))
-            ->orderBy('q.id', 'ASC')
+            ->orderBy('q.creationDate', 'DESC')
             ->getQuery()
             ->getResult()
         ;
@@ -40,7 +40,7 @@ class QuestionRepository extends ServiceEntityRepository
             ->andWhere('q.creationDate BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $date->format('y-m-d 00:00:00'))
             ->setParameter('dateMax', $date->format('y-m-d 23:59:59'))
-            ->orderBy('q.id', 'ASC')
+            ->orderBy('q.creationDate', 'DESC')
             ->getQuery()
             ->getResult()
         ;

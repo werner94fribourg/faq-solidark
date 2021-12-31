@@ -33,7 +33,7 @@ class FAQController extends AbstractController
         $this->handleQuestionFormSubmission($questionForm, $entityManager, $question);
 
         //List of entities to show on the dashboard
-        $questions = $questionRepository->findAll();
+        $questions = $questionRepository->findBy([], ['creationDate' => 'DESC']);
         
         return $this->render('faq/faq_main.html.twig', [
             'questionForm' => $questionForm->createView(),
@@ -42,12 +42,18 @@ class FAQController extends AbstractController
     }
 
     /**
-     * @Route("/question", name="question")
+     * @Route("/question/{id}", name="question")
      */
-    public function question(): Response
+    public function question($id, QuestionRepository $questionRepository): Response
     {
+        $question = $questionRepository->find($id);
+        if($question == null)
+        {
+            $this->addFlash('question_error', 'The requested question doesn\'t exist.');
+            return $this->redirectToRoute('faq_main');
+        }
         return $this->render('faq/question.html.twig', [
-            
+            'question' => $question
         ]);
     }
     
