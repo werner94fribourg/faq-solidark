@@ -29,7 +29,8 @@ class AddSkillType extends AbstractType
                             return true;
                         return !$this->user->getUserSkills()->contains($skill);
                     },
-                    'skill'),
+                    'skill'
+                ),
                 'invalid_message' => 'The requested skill doesn\'t exist or is already attributed to the user.'
             ])
         ;

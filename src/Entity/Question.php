@@ -54,18 +54,21 @@ class Question
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedQuestions")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="questions_likes")
      */
     private $likingUsers;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="dislikedQuestions")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="questions_dislikes")
      */
     private $dislikingUsers;
 
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="relatedQuestion", orphanRemoval=true)
+     * @ORM\OrderBy({"creationDate" = "DESC"})
      */
     private $answers;
 

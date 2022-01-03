@@ -47,12 +47,14 @@ class Answer
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedAnswers")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="answers_likes")
      */
     private $likingUsers;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="dislikedAnswers")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="answers_dislikes")
      */
     private $dislikingUsers;

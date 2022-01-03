@@ -49,111 +49,62 @@
   </ul>
   <div class="tab-content pt-40px" id="myTabContent">
     <div class="tab-pane fade active show" id="questions" role="tabpanel" aria-labelledby="questions-tab">
-      {% if is_granted('ROLE_USER') %}
-        <div class="row mb-4">
-          <div class="col-lg-10">
-            <h3>Ask Question</h3>
-          </div>
-          <div class="col-lg-2">
-            <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
-            <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="question_form_label">New question</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
-                      <div class="mb-3">
-                        <label for="question_form_title" class="form-label">Title</label>
-                        {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
-                        <div id="question_form_title_error" class="invalid-feedback">
-                          {{form_errors(questionForm.title)}}
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="question_form_content" class="form-label">Content</label>
-                        {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
-                        <div id="content_error" class="invalid-feedback">
-                          {{form_errors(questionForm.content)}}
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
-                        <br>
-                        <div id="question_form_belongingFAQs">
-                          {% for checkbox in questionForm.belongingFAQs.children %}
-                            <div class="form-check form-check-inline">
-                              {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
-                              {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
-                            </div>
-                          {% endfor %}
-                        </div>
-                        {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
-                        <div id="question_form_belongingFAQs_error" class="invalid-feedback">
-                          {{form_errors(questionForm.belongingFAQs)}}
-                        </div>
-                      </div>
-                    {{form_end(questionForm)}}
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <hr>
-      {% endif %}
-      <div class="row project-search">
-        <div class="col-lg-9 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search question">
-        </div>
-        <div class="col-lg-3 mb-3">
-          <a class="btn theme-btn" data-bs-toggle="collapse" href="#collapseSearchAdvanced" role="button" aria-expanded="true" aria-controls="collapseSearchAdvanced">
-            <i class="la la-gear mr-1"></i> Filters
-          </a>
-        </div>
-        <div class="col-lg-12 mb-3 collapse" id="collapseSearchAdvanced" style="">
-          <div class="search-advanced-item mb-10px">
-            <form>
-              <h4 class="fs-14 pb-2 text-gray text-uppercase">Attributes</h4>
-              <div class="divider"><span></span></div>
-              <div class="pt-3">
-                <div class="row">
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="author">Author</label>
-                    <input id="author" type="text" class="form-control mb-3" name="author">
-                  </div>
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="type">FAQ</label>
-                    <select id="type" class="form-select mb-3" name="type">
-                      <option selected="" value="0">FAQ 0</option>
-                      <option value="1">FAQ 1</option>
-                      <option value="2">FAQ 2</option>
-                      <option value="3">FAQ 3</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div><!-- end search-advanced-item -->
-        </div>
-      </div>
-      <hr>
       <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
+        <div class="col-lg-10">
           <h3>All Questions</h3>
         </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option selected="">Newest</option>
-            <option value="1">Votes</option>
-            <option value="2">Unanswered</option>
-          </select>
+        <div class="col-lg-2">
+            {% if is_granted('ROLE_USER') %}
+              <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+              <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="question_form_label">New question</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
+                        <div class="mb-3">
+                          <label for="question_form_title" class="form-label">Title</label>
+                          {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
+                          <div id="question_form_title_error" class="invalid-feedback">
+                            {{form_errors(questionForm.title)}}
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="question_form_content" class="form-label">Content</label>
+                          {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
+                          <div id="content_error" class="invalid-feedback">
+                            {{form_errors(questionForm.content)}}
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
+                          <br>
+                          <div id="question_form_belongingFAQs">
+                            {% for checkbox in questionForm.belongingFAQs.children %}
+                              <div class="form-check form-check-inline">
+                                {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                                {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                              </div>
+                            {% endfor %}
+                          </div>
+                          {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
+                          <div id="question_form_belongingFAQs_error" class="invalid-feedback">
+                            {{form_errors(questionForm.belongingFAQs)}}
+                          </div>
+                        </div>
+                      {{form_end(questionForm)}}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
         </div>
       </div>
       <div class="row">
@@ -260,21 +211,42 @@
       </div>
     </div><!-- end tab-pane -->
     <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="tags-tab">
-      <div class="row project-search">
-        <div class="col-lg-12 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search FAQ">
-        </div>
-      </div>
       <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
+        <div class="col-lg-10">
           <h3>All FAQs</h3>
         </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option selected="">Newest</option>
-            <option value="1">Most Popular</option>
-            <option value="2">Alphabetically</option>
-          </select>
+        <div class="col-lg-2">
+          {% if is_granted('ROLE_USER') %}
+            <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
+            <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="questionModalLabel">New FAQ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="faqForm" class="needs-validation" novalidate>
+                      <div class="mb-3">
+                        <label for="title" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" required />
+                        <div id="name_error" class="invalid-feedback">Name error message.</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" rows="4" required=""></textarea>
+                        <div id="description_error" class="invalid-feedback">Description error message.</div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
       </div>
       <div class="row">
@@ -329,40 +301,6 @@
           </div>
         </div>
       </div>
-      <div class="row mb-4">
-        <div class="col-lg-10"></div>
-        <div class="col-lg-2">
-          <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
-        </div>
-      </div>
-      <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="questionModalLabel">New FAQ</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="faqForm" class="needs-validation" novalidate>
-                <div class="mb-3">
-                  <label for="title" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="name" required />
-                  <div id="name_error" class="invalid-feedback">Name error message.</div>
-                </div>
-                <div class="mb-3">
-                  <label for="description" class="form-label">Description</label>
-                  <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                  <div id="description_error" class="invalid-feedback">Description error message.</div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="row">
         <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
           <div class="pager faq-paginator">
@@ -395,20 +333,11 @@
       </div>
     </div><!-- end tab-pane -->
     <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
-      <div class="row project-search">
-        <div class="col-lg-12 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search User">
-        </div>
-      </div>
       <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
+        <div class="col-lg-10">
           <h3>All users</h3>
         </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option value="1">Most Questions asked</option>
-            <option value="2">Alphabetically</option>
-          </select>
+        <div class="col-lg-2">
         </div>
       </div>
       <div class="row">
