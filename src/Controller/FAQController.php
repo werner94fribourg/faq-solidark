@@ -49,9 +49,15 @@ class FAQController extends AbstractController
     /**
      * @Route("/question/{id}", name="question")
      */
-    public function question($id, UserRepository $userRepository, QuestionRepository $questionRepository): Response
+    public function question($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager): Response
     {
         $question = $questionRepository->find($id);
+
+        //Modify question form
+        $questionForm = $this->createForm(QuestionFormType::class, $question);
+        $questionForm->handleRequest($request);
+        //Handling of submission of modifying the question
+        $this->handleQuestionFormSubmission($questionForm, $entityManager, $question, false);
         $hasAdminRightToDeleteQuestion = false;
         if($this->isGranted('IS_AUTHENTICATED_REMEMBERED'))
         {
@@ -65,6 +71,7 @@ class FAQController extends AbstractController
         }
         return $this->render('faq/question.html.twig', [
             'question' => $question,
+            'questionForm' => $questionForm->createView(),
             'hasAdminRightToDeleteQuestion' => $hasAdminRightToDeleteQuestion
         ]);
     }
@@ -158,7 +165,7 @@ class FAQController extends AbstractController
         }
     }
 
-    private function handleQuestionFormSubmission(Form $form, EntityManagerInterface $entityManager, Question $question)
+    private function handleQuestionFormSubmission(Form $form, EntityManagerInterface $entityManager, Question $question, $newQuestion = true)
     {
         if($form->isSubmitted())
         {
@@ -169,10 +176,18 @@ class FAQController extends AbstractController
                 $question->setCreationDate($currentDate);
                 $entityManager->persist($question);
                 $entityManager->flush();
-                $this->addFlash('new_question_success', 'The question has successfully been added.');
+                if($newQuestion)
+                    $this->addFlash('question_success', 'The question has successfully been added.');
+                else
+                    $this->addFlash('question_success', 'The question has successfully been updated.');
             }
             else
-                $this->addFlash('new_question_error', 'Error while trying to add the question.');
+            {
+                if($newQuestion)
+                    $this->addFlash('question_error', 'Error while trying to add the question.');
+                else
+                    $this->addFlash('question_error', 'Error while trying to update the question.');
+            }
         }
     }
         

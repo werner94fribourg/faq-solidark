@@ -1,6 +1,31 @@
 {% extends 'faq/base.html.twig' %}
+{% if app.session.flashbag.peek('question_error')|length > 0 %}
+  {% set modifyQuestionAttempt = true %}
+{% else %}
+  {% set modifyQuestionAttempt = false %}
+{% endif %}
 
 {% block title %}Question{% endblock %}
+
+{% block main %}
+  {% for error in app.flashes('question_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
 
 {% block faqcontent %}
   <div class="row">
@@ -37,6 +62,57 @@
             <div class="col-lg-10"></div>
             <div class="col-lg-2">
               <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if app.user.id == question.creator.id %}
+                <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>
+                <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" style="display: none;" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="faq_form_label">Modify Question</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
+                          <div class="mb-3">
+                            <label for="question_form_title" class="form-label">Title</label>
+                            {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
+                            <div id="question_form_title_error" class="invalid-feedback">
+                              {{form_errors(questionForm.title)}}
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="question_form_content" class="form-label">Content</label>
+                            {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
+                            <div id="content_error" class="invalid-feedback">
+                              {{form_errors(questionForm.content)}}
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
+                            <br>
+                            <div id="question_form_belongingFAQs">
+                              {% for checkbox in questionForm.belongingFAQs.children %}
+                                <div class="form-check form-check-inline">
+                                  {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                                  {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                                </div>
+                              {% endfor %}
+                            </div>
+                            {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
+                            <div id="question_form_belongingFAQs_error" class="invalid-feedback">
+                              {{form_errors(questionForm.belongingFAQs)}}
+                            </div>
+                          </div>
+                        {{form_end(questionForm)}}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
             </div>
           </div>
         {% endif %}
@@ -101,4 +177,13 @@
       </div>
     </div>
   </div>
+{% endblock %}
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    {% if modifyQuestionAttempt %}
+      document.getElementById("question_form").classList.add("was-validated");
+      $('#question_form_button')[0].click();
+    {% endif %}
+  </script>
 {% endblock %}

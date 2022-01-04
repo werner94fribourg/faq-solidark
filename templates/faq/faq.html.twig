@@ -169,6 +169,7 @@
 {% block customfaqjavascripts %}
   {{parent()}}
   <script>
+    $('#faq-{{faq.id}}').addClass("active");
     {% if modifyFAQAttempt %}
       document.getElementById("faq_form").classList.add("was-validated");
       $("#faq_form_button")[0].click();

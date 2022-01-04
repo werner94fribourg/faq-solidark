@@ -1,5 +1,5 @@
 {% extends 'faq/base.html.twig' %}
-{% if app.session.flashbag.peek('new_question_error')|length > 0 %}
+{% if app.session.flashbag.peek('question_error')|length > 0 %}
   {% set newQuestionAttempt = true %}
 {% else %}
   {% set newQuestionAttempt = false %}
@@ -16,7 +16,7 @@
       </button>
     </div>
   {% endfor %}
-  {% for error in app.flashes('new_question_error') %}
+  {% for error in app.flashes('question_error') %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>{{ error }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -24,7 +24,7 @@
       </button>
     </div>
   {% endfor %}
-  {% for flashSuccess in app.flashes('new_question_success') %}
+  {% for flashSuccess in app.flashes('question_success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>{{ flashSuccess }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
