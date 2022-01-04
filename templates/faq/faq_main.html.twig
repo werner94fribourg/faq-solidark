@@ -32,6 +32,22 @@
       </button>
     </div>
   {% endfor %}
+  {% for error in app.flashes('delete_question_error') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
   {{parent()}}
 {% endblock %}
 
@@ -138,39 +154,12 @@
                     <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
                   {% endfor %}
                 </div>
-                {% if is_granted('ROLE_SUPERADMIN') %}
+                {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and app.user.id == question.creator.id) %}
                   <hr>
                   <div class="row mb-4">
                     <div class="col-lg-8"></div>
                     <div class="col-lg-4 mb-2">
-                      <a id="questionDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-                      <button type="button" id="assignFaqButton" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assignFaqModal">FAQ</button>
-                      <div class="modal fade" id="assignFaqModal" tabindex="-1" aria-labelledby="assignFaqButton" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="questionModalLabel">New Assignment</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              <form id="faqForm" class="needs-validation" novalidate>
-                                <div class="mb-3">
-                                  <label for="assignment" class="form-label">Assignment</label>
-                                  <select id="assignment" class="form-select">
-                                    <option selected value="1">FAQ 1</option>
-                                    <option value="2">FAQ 2</option>
-                                    <option value="3">FAQ 3</option>
-                                  </select>
-                                </div>
-                              </form>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                   </div>
                 {% endif %}
@@ -186,89 +175,25 @@
           <h3>All FAQs</h3>
         </div>
         <div class="col-lg-2">
-          {% if is_granted('ROLE_USER') %}
-            <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
-            <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="questionModalLabel">New FAQ</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form id="faqForm" class="needs-validation" novalidate>
-                      <div class="mb-3">
-                        <label for="title" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" required />
-                        <div id="name_error" class="invalid-feedback">Name error message.</div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                        <div id="description_error" class="invalid-feedback">Description error message.</div>
-                      </div>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          {% endif %}
         </div>
       </div>
       <div class="row">
         <div class="faq-list col-lg-12">
-          <div class="media-card align-items-center">
-            <div class="media-body">
-              <div class="tags pb-1">
-                <a href="#" class="tag-link tag-link-md tag-link-blue">FAQ 1</a>
-              </div>
-              <p class="card-text fs-14 truncate-4 lh-24">
-                For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript). Please include all relevant tags on your question; e.g., [node.js],…
-              </p>
-              <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
-                <p class="lh-18">2177849 questions, 901 asked today, 5319 this week</p>
-              </div>
-              <div class="row mb-4">
-                <div class="col-lg-10"></div>
-                <div class="col-lg-2">
-                  <a id="faqDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-                  <a type="button" id="modifyFaqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#modifyFaqModal"><span class="glyphicon glyphicon-pencil"></span></a>
-                  <div class="modal fade" id="modifyFaqModal" tabindex="-1" aria-labelledby="modifyFaqButton" style="display: none;" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="questionModalLabel">Modify FAQ</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form id="modifyFaqForm" class="needs-validation" novalidate="">
-                            <div class="mb-3">
-                              <label for="title" class="form-label">Name</label>
-                              <input type="text" class="form-control" id="name" required="">
-                              <div id="name_error" class="invalid-feedback">Name error message.</div>
-                            </div>
-                            <div class="mb-3">
-                              <label for="description" class="form-label">Description</label>
-                              <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                              <div id="description_error" class="invalid-feedback">Description error message.</div>
-                            </div>
-                          </form>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" form="modifyFaqForm" class="btn btn-primary">Save changes</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          {% for faq in faqs %}
+            <div class="media-card align-items-center">
+              <div class="media-body">
+                <div class="tags pb-1">
+                  <a href="{{path('faq', {'id': faq.id})}}" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
+                </div>
+                <p class="card-text fs-14 truncate-4 lh-24">
+                  {{faq.description}}
+                </p>
+                <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
+                  <p class="lh-18">{{faq.relatedQuestions|length}} questions</p>
                 </div>
               </div>
             </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div><!-- end tab-pane -->
@@ -282,16 +207,18 @@
       </div>
       <div class="row">
         <div class="user-list col-lg-12">
-          <div class="media media-card p-3">
-            <a href="#" class="media-img d-inline-block">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt="company logo">
-            </a>
-            <div class="media-body">
-              <h5 class="fs-16 fw-medium"><a href="profile.html">werner94fribourg</a></h5>
-              <p class="meta d-block lh-24 pb-1"><span>Informatician</span></p>
-              <p class="fw-medium fs-15 text-black-50 lh-18">1,200 questions asked</p>
-            </div><!-- end media-body -->
-          </div>
+          {% for user in users %}
+            <div class="media media-card p-3">
+              <a href="{{path('profile', {'id': user.id})}}" class="media-img d-inline-block">
+                <img src="{{path('show_profile_picture', {'id': user.id})}}" alt="user-{{user.id}} profile picture">
+              </a>
+              <div class="media-body">
+                <h5 class="fs-16 fw-medium"><a href="{{path('profile', {'id': user.id})}}">{{user.username}}</a></h5>
+                <p class="meta d-block lh-24 pb-1"><span>{{user.occupation}}</span></p>
+                <p class="fw-medium fs-15 text-black-50 lh-18">{{user.askedQuestions|length}} questions asked</p>
+              </div><!-- end media-body -->
+            </div>
+          {% endfor %}
         </div>
       </div><!-- end tab-pane -->
     </div><!-- end tab-content -->

@@ -121,9 +121,9 @@ class ProfileController extends AbstractController
     /**
      * @Route("modify-password", name="modify_password")
      */
-    public function modifyPassword(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    public function modifyPassword(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, UserPasswordHasherInterface $passwordHasher): Response
     {
-        $user = $this->getUser();
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         $form = $this->createForm(ChangePasswordRequestFormType::class);
         $form->handleRequest($request);
         $validated = false;
@@ -156,9 +156,9 @@ class ProfileController extends AbstractController
     /**
      * @Route("/my-profile", name="my_profile")
      */
-    public function myProfile(Request $request, EntityManagerInterface $entityManager, SkillRepository $skillRepository, FileUploader $fileUploader, Filesystem $filesystem): Response
+    public function myProfile(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, SkillRepository $skillRepository, FileUploader $fileUploader, Filesystem $filesystem): Response
     {
-        $user = $this->getUser();
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         //Change profile picture form
         $changeProfilePictureForm = $this->createForm(ChangeProfilePictureFormType::class);
         $changeProfilePictureForm->handleRequest($request);

@@ -21,30 +21,6 @@ class QuestionRepository extends ServiceEntityRepository
         parent::__construct($registry, Question::class);
     }
 
-    public function findWeeklyQuestions()
-    {
-        $date = new \DateTime('7 days ago');
-        return $this->createQueryBuilder('q')
-            ->andWhere('q.creationDate >= :date')
-            ->setParameter('date', $date->format('y-m-d 00:00:00'))
-            ->orderBy('q.creationDate', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-
-    public function findTodayQuestions()
-    {
-        $date = new \DateTime('now');
-        return $this->createQueryBuilder('q')
-            ->andWhere('q.creationDate BETWEEN :dateMin AND :dateMax')
-            ->setParameter('dateMin', $date->format('y-m-d 00:00:00'))
-            ->setParameter('dateMax', $date->format('y-m-d 23:59:59'))
-            ->orderBy('q.creationDate', 'DESC')
-            ->getQuery()
-            ->getResult()
-        ;
-    }
     // /**
     //  * @return Question[] Returns an array of Question objects
     //  */

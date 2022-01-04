@@ -1,0 +1,85 @@
+{% extends 'faq/base.html.twig' %}
+
+{% block title %}Unassigned questions{% endblock %}
+
+{% block main %}
+  {{parent()}}
+{% endblock %}
+
+{% block faqcontent %}
+  <div class="row mb-4 mt-2">
+    <h3>List of unassigned questions</h3>
+  </div>
+  <div class="question-list">
+    {% for question in unassignedQuestions %}
+      <div id="question-{{question.id}}" class="media-card align-items-center">
+        <div class="votes">
+          <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+            {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
+            {% if votes_count >= 0 %}
+              <span class="vote-counts up ">{{votes_count}}</span>
+              <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+            {% else %}
+              <span class="vote-counts down">{{votes_count|abs}}</span>
+              <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+            {% endif %}
+          </div>
+          <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+            <span class="vote-counts">{{question.answers|length}}</span>
+            <span class="answer-icon"></span>
+          </div>
+        </div>
+        <div class="media-body">
+          <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
+          <small class="meta">
+            <span class="pr-1">{{question.creationDate|ago}}</span>
+            <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
+          </small>
+          <div class="tags">
+            {% for belongingFaq in question.belongingFAQs %}
+              <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+            {% endfor %}
+          </div>
+          {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id)) %}
+            <hr>
+            <div class="row mb-4">
+              <div class="col-lg-8"></div>
+              <div class="col-lg-4 mb-2">
+                <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                {% if is_granted('ROLE_SUPERADMIN') %}
+                  <button type="button" id="assignFaqButton" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assignFaqModal">FAQ</button>
+                  <div class="modal fade" id="assignFaqModal" tabindex="-1" aria-labelledby="assignFaqButton" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="questionModalLabel">New Assignment</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <form id="faqForm" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                              <label for="assignment" class="form-label">Assignment</label>
+                              <select id="assignment" class="form-select">
+                                <option selected value="1">FAQ 1</option>
+                                <option value="2">FAQ 2</option>
+                                <option value="3">FAQ 3</option>
+                              </select>
+                            </div>
+                          </form>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
