@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\FAQRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +21,15 @@ class MainController extends AbstractController
             return $this->redirectToRoute('index');
         }
         return $this->render('base.html.twig', [
+            
+        ]);
+    }
 
+    public function getAllFaqs(FAQRepository $fAQRepository)
+    {
+        $faqs = $fAQRepository->findAll();
+        return $this->render('all_faqs.html.twig', [
+            'faqs' => $faqs
         ]);
     }
     

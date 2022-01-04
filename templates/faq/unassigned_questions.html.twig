@@ -83,3 +83,10 @@
     {% endfor %}
   </div>
 {% endblock %}
+
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    $('#unassigned_questions_link').addClass("active");
+  </script>
+{% endblock %}
