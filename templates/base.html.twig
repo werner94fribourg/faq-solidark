@@ -40,6 +40,9 @@
               <li class="nav-item">
                 <a href="#" class="nav-link disabled" id="project_link">Projects</a>
               </li>
+              <li class="nav-item">
+                <a href="{{path('skill_main')}}" class="nav-link" id="skill_link">Skills</a>
+              </li>
               {% if is_granted('ROLE_SUPERADMIN') %}
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" id="admin_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

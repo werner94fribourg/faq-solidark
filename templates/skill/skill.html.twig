@@ -54,7 +54,7 @@
     <div class="media-card align-items-center">
       <div class="media-body">
         <div class="tags pb-1">
-          <a href="#" class="tag-link tag-link-md tag-link-blue">{{skill.name}}</a>
+          <a href="{{path('skill', {'id': skill.id})}}" class="tag-link tag-link-md tag-link-blue">{{skill.name}}</a>
         </div>
         <p class="card-text fs-14 truncate-4 lh-24">
           {{skill.description}}
@@ -165,36 +165,6 @@
         </div>
       </div>
     {% endfor %}
-    <div class="row">
-        <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
-          <div class="pager user-paginator">
-            <nav aria-label="Page navigation questions">
-              <ul class="pagination generic-pagination pr-1">
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">«</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">»</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <p class="fs-13 pt-3">Showing 1-15 results of 50,577 questions</p>
-          </div>
-        </div>
-      </div>
   </div>
 {% endblock %}
 

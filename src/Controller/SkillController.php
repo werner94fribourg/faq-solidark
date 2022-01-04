@@ -14,12 +14,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 /**
-* @Route("/skill")
+* @Route("/skills")
 */
 class SkillController extends AbstractController
 {
     /**
-     * @Route("/{id}", name="skill")
+     * @Route("", name="skill_main")
+     */
+    public function skillMain(SkillRepository $skillRepository):Response
+    {
+        $skills = $skillRepository->findAll();
+        return $this->render('skill/skill_main.html.twig', [
+            'skills' => $skills
+        ]);
+    }
+
+    /**
+     * @Route("/skill/{id}", name="skill")
      */
     public function skill($id, Request $request, EntityManagerInterface $entityManager, SkillRepository $skillRepository): Response
     {
