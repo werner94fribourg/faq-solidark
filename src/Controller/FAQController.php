@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Answer;
 use App\Entity\FAQ;
 use App\Entity\Question;
+use App\Form\AnswerFormType;
 use App\Form\FaqFormType;
 use App\Form\QuestionFormType;
 use App\Repository\FAQRepository;
@@ -58,6 +60,14 @@ class FAQController extends AbstractController
         $questionForm->handleRequest($request);
         //Handling of submission of modifying the question
         $this->handleQuestionFormSubmission($questionForm, $entityManager, $question, false);
+
+        //Answer form
+        $answer = new Answer();
+        $answerForm = $this->createForm(AnswerFormType::class, $answer);
+        $answerForm->handleRequest($request);
+        //Handling of submission of new answer
+        $this->handleAnswerFormSubmission($answerForm, $question, $entityManager, $answer);
+
         $hasAdminRightToDeleteQuestion = false;
         if($this->isGranted('IS_AUTHENTICATED_REMEMBERED'))
         {
@@ -72,7 +82,8 @@ class FAQController extends AbstractController
         return $this->render('faq/question.html.twig', [
             'question' => $question,
             'questionForm' => $questionForm->createView(),
-            'hasAdminRightToDeleteQuestion' => $hasAdminRightToDeleteQuestion
+            'hasAdminRightToDeleteQuestion' => $hasAdminRightToDeleteQuestion,
+            'answerForm' => $answerForm->createView()
         ]);
     }
 
@@ -241,6 +252,28 @@ class FAQController extends AbstractController
                     $this->addFlash('question_error', 'Error while trying to add the question.');
                 else
                     $this->addFlash('question_error', 'Error while trying to update the question.');
+            }
+        }
+    }
+
+    private function handleAnswerFormSubmission(Form $form, Question $question, EntityManagerInterface $entityManager, Answer $answer)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $answer->setRelatedQuestion($question);
+                $answer->setEditor($this->getUser());
+                $currentDate = new \DateTime('now');
+                $answer->setCreationDate($currentDate);
+                $entityManager->persist($answer);
+                $entityManager->flush();
+                $this->addFlash('new_answer_success', 'The answer has successfully been added.');
+                $answer = new Answer();
+            }
+            else
+            {
+                $this->addFlash('new_answer_error', 'Error while trying to add the answer.');
             }
         }
     }

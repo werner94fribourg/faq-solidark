@@ -4,6 +4,11 @@
 {% else %}
   {% set modifyQuestionAttempt = false %}
 {% endif %}
+{% if app.session.flashbag.peek('new_answer_error')|length > 0 %}
+  {% set newAnswerAttempt = true %}
+{% else %}
+  {% set newAnswerAttempt = false %}
+{% endif %}
 
 {% block title %}Question{% endblock %}
 
@@ -17,6 +22,22 @@
     </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('new_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('new_answer_success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>{{ flashSuccess }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -124,58 +145,64 @@
       <h5 class="h3">Answers</h5>
     </div>
     <div class="col-lg-2">
-      <a type="button" id="answerButton" class="form-button" data-bs-toggle="modal" data-bs-target="#answerModal"><span class="glyphicon glyphicon-plus"></span></a>
-      <div class="modal fade" id="answerModal" tabindex="-1" aria-labelledby="answerButton" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">New answer</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="answerForm" class="register-form needs-validation" novalidate>
-                <div class="mb-3">
-                  <label for="content" class="form-label">Content</label>
-                  <textarea class="form-control" id="content" rows="4" required></textarea>
-                  <div id="content_error" class="invalid-feedback">Content error message.</div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" form="answerForm" class="btn btn-primary">Save changes</button>
+      {% if is_granted('ROLE_USER') %}
+        <a type="button" id="answer_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#answer_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+        <div class="modal fade" id="answer_form_modal" tabindex="-1" aria-labelledby="answer_form_button" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="answer_form_label">New answer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                {{form_start(answerForm, {'attr': {'class': 'needs-validation', 'id': 'answer_form'}})}}
+                  <div class="mb-3">
+                    <label for="answer_form_content" class="form-label">Content</label>
+                    {{form_widget(answerForm.content, {'attr': {'class': 'form-control'}})}}
+                    <div id="answer_form_content_error" class="invalid-feedback">
+                      {{form_errors(answerForm.content)}}
+                    </div>
+                  </div>
+                {{form_end(answerForm)}}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="answer_form" class="btn btn-primary">Save changes</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      {% endif %}
     </div>
   </div>
   <hr>
   <div class="answer-list">
-    <div class="row">
-      <div class="media-card align-items-center">
-        <div class="votes">
-          <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-            <span class="answer vote-counts up">0</span>
-            <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+    {% for answer in question.answers %}
+      <div class="row">
+        <div id="question-{{answer.id}}" class="media-card align-items-center">
+          <div class="votes">
+            <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+              <span class="answer vote-counts up">{{answer.likingUsers|length}}</span>
+              <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+            </div>
+            <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+              <span class="answer vote-counts down">{{answer.dislikingUsers|length}}</span>
+              <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+            </div>
           </div>
-          <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-            <span class="answer vote-counts down">0</span>
-            <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
-          </div>
-        </div>
-        <div class="media-body">
-          <h5><a href="#">werner94fribourg</a></h5>
-          <small class="meta">
-            <span class="pr-1">1 hour ago</span>
-          </small>
-          <hr>
-          <div class="answer-content">
-            First answer
+          <div class="media-body">
+            <h5><a href="#">{{answer.editor.username}}</a></h5>
+            <small class="meta">
+              <span class="pr-1">{{answer.creationDate|ago}}</span>
+            </small>
+            <hr>
+            <div class="answer-content">
+              {{answer.content}}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {% endfor %}
   </div>
 {% endblock %}
 {% block customfaqjavascripts %}
@@ -209,6 +236,10 @@
         })
       }
     });
+    {% if newAnswerAttempt %}
+      document.getElementById("answer_form").classList.add("was-validated");
+      $('#answer_form_button')[0].click();
+    {% endif %}
     {% if modifyQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();
