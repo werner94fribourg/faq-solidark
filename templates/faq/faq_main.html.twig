@@ -131,10 +131,10 @@
                 <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
                   {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
                   {% if votes_count >= 0 %}
-                    <span class="vote-counts up ">{{votes_count}}</span>
+                    <span class="vote-counts up" data-url="{{path('check_liking_question', {'id':question.id})}}">{{votes_count}}</span>
                     <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
                   {% else %}
-                    <span class="vote-counts down">{{votes_count|abs}}</span>
+                    <span class="vote-counts down" data-url="{{path('check_liking_question', {'id':question.id})}}">{{votes_count}}</span>
                     <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
                   {% endif %}
                 </div>
@@ -229,6 +229,20 @@
   {{parent()}}
   <script>
     $('#faq_main_link').addClass("active");
+    $('.vote-counts').each(function(){
+      var $url = $(this).attr('data-url');
+      var tag = $(this);
+      if($url !== undefined)
+      {
+        $.ajax({
+          method: 'POST',
+          url: $url
+        }).done(function(data){
+          if(data.like == 'true' || data.dislike == 'true')
+            tag.attr('style', 'text-decoration:underline;');
+        })
+      }
+    });
     {% if newQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();

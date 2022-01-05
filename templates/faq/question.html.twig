@@ -32,12 +32,12 @@
     <div class="media-card align-items-center">
       <div class="votes">
         <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-          <span class="vote-counts up">{{question.likingUsers|length}}</span>
-          <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+          <span id="question-vote-like" class="question-vote-like vote-counts up" data-url="{{path('check_liking_question', {'id':question.id})}}">{{question.likingUsers|length}}</span>
+          <span class="vote-icon">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-up" href="{{path('like_question', {'id': question.id})}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-up"></span>{% endif %}</span>
         </div>
         <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-          <span class="vote-counts down">{{question.dislikingUsers|length}}</span>
-          <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+          <span id="question-vote-dislike" class="question-vote-dislike vote-counts down" data-url="{{path('check_liking_question', {'id':question.id})}}">{{question.dislikingUsers|length}}</span>
+          <span class="vote-icon down">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-down" href="{{path('dislike_question', {'id': question.id})}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-down"></span>{% endif %}</span>
         </div>
       </div>
       <div class="media-body">
@@ -156,11 +156,11 @@
       <div class="media-card align-items-center">
         <div class="votes">
           <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-            <span class="vote-counts up">0</span>
+            <span class="answer vote-counts up">0</span>
             <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
           </div>
           <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-            <span class="vote-counts down">0</span>
+            <span class="answer vote-counts down">0</span>
             <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
           </div>
         </div>
@@ -181,9 +181,103 @@
 {% block customfaqjavascripts %}
   {{parent()}}
   <script>
+    $('.question-vote-like').each(function(){
+      var $url = $(this).attr('data-url');
+      var tag = $(this);
+      if($url !== undefined)
+      {
+        $.ajax({
+          method: 'POST',
+          url: $url
+        }).done(function(data){
+          if(data.like == 'true')
+            tag.attr('style', 'text-decoration:underline;');
+        })
+      }
+    });
+    $('.question-vote-dislike').each(function(){
+      var $url = $(this).attr('data-url');
+      var tag = $(this);
+      if($url !== undefined)
+      {
+        $.ajax({
+          method: 'POST',
+          url: $url
+        }).done(function(data){
+          if(data.dislike == 'true')
+            tag.attr('style', 'text-decoration:underline;');
+        })
+      }
+    });
     {% if modifyQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();
+    {% endif %}
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+      $('.glyphicon-thumbs-up').click(function(e){
+          e.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            method: 'POST',
+            url: url
+          }).done(function(data){
+              var val = parseInt($('#question-vote-like').html().replace(/[^0-9]/g,''));
+              var result = data.action;
+              if(result == 'liked')
+              {
+                val++;
+                $('#question-vote-like').html(val);
+                $('#question-vote-like').attr('style', 'text-decoration:underline;');
+                if($('#question-vote-dislike')[0].hasAttribute('style'))
+                {
+                  var val = parseInt($('#question-vote-dislike').html().replace(/[^0-9]/g,''));
+                  val--;
+                  $('#question-vote-dislike').html(val);
+                  $('#question-vote-dislike').removeAttr('style');
+                }
+              }
+              else if(result == 'unliked')
+              {
+                val--;
+                $('#question-vote-like').html(val);
+                $('#question-vote-like').removeAttr('style');
+              }
+            }
+          )
+        }
+      )
+      $('.glyphicon-thumbs-down').click(function(e){
+          e.preventDefault();
+          var url = $(this).attr('href');
+          $.ajax({
+            method: 'POST',
+            url: url
+          }).done(function(data){
+              var val = parseInt($('#question-vote-dislike').html().replace(/[^0-9]/g,''));
+              var result = data.action;
+              if(result == 'disliked')
+              {
+                val++;
+                $('#question-vote-dislike').html(val);
+                $('#question-vote-dislike').attr('style', 'text-decoration:underline;');
+                if($('#question-vote-like')[0].hasAttribute('style'))
+                {
+                  var val = parseInt($('#question-vote-like').html().replace(/[^0-9]/g,''));
+                  val--;
+                  $('#question-vote-like').html(val);
+                  $('#question-vote-like').removeAttr('style');
+                }
+              }
+              else if(result == 'undodisliked')
+              {
+                val--;
+                $('#question-vote-dislike').html(val);
+                $('#question-vote-dislike').removeAttr('style');
+              }
+            }
+          )
+        }
+      )
     {% endif %}
   </script>
 {% endblock %}

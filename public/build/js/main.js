@@ -7,10 +7,6 @@ $('.invalid-feedback').each(function(){
   if(str.trim().length)
   {
     $(this).prev().val('');
-    console.log('not empty');
-  }
-  else {
-    console.log('empty');
   }
 }
 );

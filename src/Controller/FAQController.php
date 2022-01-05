@@ -75,6 +75,7 @@ class FAQController extends AbstractController
             'hasAdminRightToDeleteQuestion' => $hasAdminRightToDeleteQuestion
         ]);
     }
+
     /**
      * @Route("/delete-question/{id}", name="delete_question")
      */
@@ -106,15 +107,68 @@ class FAQController extends AbstractController
         return $this->redirectToRoute('faq_main');
     }
 
-    private function hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs)
+    /**
+     * @Route("/like-question-{id}", name="like_question", methods={"POST"})
+     * @Route("/dislike-question-{id}", name="dislike_question", methods={"POST"})
+     * @Route("/undodislike-question-{id}", name="undodislike_question", methods={"POST"})
+     */
+    public function toggleLikesAjax($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager): Response
     {
-        foreach($moderatedFAQs as $moderatedFAQ)
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $question = $questionRepository->find($id);
+        if($question == null)
+            return $this->json(['action' => 'error', 'id' => $id]);
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $result = '';
+        switch($request->get('_route'))
         {
-            if($belongingsFAQs->contains($moderatedFAQ))
-                return true;
+            case 'like_question':
+                if($question->getLikingUsers()->contains($user))
+                {
+                    $question->removeLikingUser($user);
+                    $result = 'unliked';
+                }
+                else
+                {
+                    $question->addLikingUser($user);
+                    $result = 'liked';
+                }
+                break;
+            case 'dislike_question':
+                if($question->getDislikingUsers()->contains($user))
+                {
+                    $question->removeDislikingUser($user);
+                    $result = 'undodisliked';
+                }
+                else
+                {
+                    $question->addDislikingUser($user);
+                    $result = 'disliked';
+                }
+                break;
         }
-        return false;
+        $entityManager->persist($question);
+        $entityManager->flush();
+        return $this->json(['action' => $result, 'id' => $id]);
     }
+
+    /**
+     * @Route("/check-liking-question-{id}", name="check_liking_question", methods={"POST"})
+     */
+    public function checkLikes($id, QuestionRepository $questionRepository, UserRepository $userRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $question = $questionRepository->find($id);
+        if($question == null)
+            return $this->json(['like' => 'false', 'dislike' => 'false']);
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        if($user->getLikedQuestions()->contains($question))
+            return $this->json(['like' => 'true', 'dislike' => 'false']);
+        if($user->getDislikedQuestions()->contains($question))
+            return $this->json(['like' => 'false', 'dislike' => 'true']);
+        return $this->json(['like' => 'false', 'dislike' => 'false']);
+    }
+
     /**
      * @Route("/faq/{id}", name="faq", requirements={"id"="\d+"})
      */
@@ -203,5 +257,15 @@ class FAQController extends AbstractController
             }
         }
         return $unassignedQuestions;
+    }
+
+    private function hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs)
+    {
+        foreach($moderatedFAQs as $moderatedFAQ)
+        {
+            if($belongingsFAQs->contains($moderatedFAQ))
+                return true;
+        }
+        return false;
     }
 }

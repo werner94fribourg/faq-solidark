@@ -171,6 +171,8 @@ class Question
             $this->likingUsers[] = $likingUser;
         }
 
+        $this->removeDislikingUser($likingUser);
+
         return $this;
     }
 
@@ -194,6 +196,8 @@ class Question
         if (!$this->dislikingUsers->contains($dislikingUser)) {
             $this->dislikingUsers[] = $dislikingUser;
         }
+
+        $this->removelikingUser($dislikingUser);
 
         return $this;
     }
