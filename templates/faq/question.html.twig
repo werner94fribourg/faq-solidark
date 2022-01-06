@@ -9,6 +9,11 @@
 {% else %}
   {% set newAnswerAttempt = false %}
 {% endif %}
+{% if app.session.flashbag.peek('modify_answer_invalid_error')|length > 0 %}
+  {% set modifyAnswerAttempt = true %}
+{% else %}
+  {% set modifyAnswerAttempt = false %}
+{% endif %}
 
 {% block title %}Question{% endblock %}
 
@@ -38,6 +43,46 @@
     </div>
   {% endfor %}
   {% for flashSuccess in app.flashes('new_answer_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_answer_invalid_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('modify_answer_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_answer_success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>{{ flashSuccess }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -78,7 +123,7 @@
             {{question.content}}
           </div>
         </div>
-        {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id or (hasAdminRightToDeleteQuestion))) %}
+        {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id or hasAdminRightToDeleteQuestion)) %}
           <div class="row mb-4">
             <div class="col-lg-10"></div>
             <div class="col-lg-2">
@@ -196,14 +241,47 @@
               <span class="pr-1">{{answer.creationDate|ago}}</span>
             </small>
             <hr>
-            <div class="answer-content">
-              {{answer.content}}
-            </div>
+            <div class="answer-content">{{answer.content}}</div>
+            {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (hasAdminRightToDeleteQuestion or app.user.id == answer.editor.id)) %}
+              <a class="form-button delete_answer" href="{{path('delete_answer', {'question_id': question.id, 'answer_id': answer.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if app.user.id == answer.editor.id %}
+                <a type="button" id="answer_form_button-{{answer.id}}" class="form-button" onclick="showAnswerModal({{answer.id}})"><span class="glyphicon glyphicon-pencil"></span></a>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
+  {% if app.user != null %}
+    <a type="button" id="modify_answer_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#modify_answer_form_modal" style="display:none;"><span class="glyphicon glyphicon-pencil"></span></a>
+    <div class="modal fade" id="modify_answer_form_modal" aria-labelledby="modify_answer_form_button" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="answer_form_label">Modify Answer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{form_start(modifyAnswerForm, {'attr': {'class': 'needs-validation', 'id': 'modify_answer_form'}})}}
+              <div class="mb-3">
+                <label for="question_form_title" class="form-label">Title</label>
+                {{form_widget(modifyAnswerForm.content, {'attr': {'class': 'form-control'}})}}
+                <div id="question_form_title_error" class="invalid-feedback">
+                  {{form_errors(modifyAnswerForm.content)}}
+                </div>
+              </div>
+              {{form_widget(modifyAnswerForm.answer_id, {'attr': {'style': 'display:none;'}})}}
+            {{form_end(modifyAnswerForm)}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="modify_answer_form" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}
 {% block customfaqjavascripts %}
   {{parent()}}
@@ -243,6 +321,10 @@
     {% if modifyQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();
+    {% endif %}
+    {% if modifyAnswerAttempt %}
+      document.getElementById("modify_answer_form").classList.add("was-validated");
+      $('#modify_answer_form_button')[0].click();
     {% endif %}
     {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
       $('.glyphicon-thumbs-up').click(function(e){
@@ -309,6 +391,15 @@
           )
         }
       )
+    {% endif %}
+    {% if app.user != null %}
+      function showAnswerModal(answer_id)
+      {
+        $('#modify_answer_form_button')[0].click();
+        var text = $('#question-'+answer_id).find('.answer-content').text();
+        $('#modify_answer_form_content').val(text);
+        $('#modify_answer_form_answer_id').val(answer_id);
+      }
     {% endif %}
   </script>
 {% endblock %}

@@ -7,7 +7,9 @@ use App\Entity\FAQ;
 use App\Entity\Question;
 use App\Form\AnswerFormType;
 use App\Form\FaqFormType;
+use App\Form\ModifyAnswerFormType;
 use App\Form\QuestionFormType;
+use App\Repository\AnswerRepository;
 use App\Repository\FAQRepository;
 use App\Repository\QuestionRepository;
 use App\Repository\UserRepository;
@@ -23,6 +25,11 @@ use Symfony\Component\Routing\Annotation\Route;
 */
 class FAQController extends AbstractController
 {
+    public function __construct()
+    {
+        $this->modifyAnswerForm = null;
+    }
+
     /**
      * @Route("", name="faq_main")
      */
@@ -34,7 +41,6 @@ class FAQController extends AbstractController
         $questionForm->handleRequest($request);
         //Handling of submission of new question
         $this->handleQuestionFormSubmission($questionForm, $entityManager, $question);
-
         //List of entities to show on the dashboard
         $questions = $questionRepository->findBy([], ['creationDate' => 'DESC']);
         $faqs = $fAQRepository->findBy([], ['name' => 'ASC']);
@@ -51,7 +57,7 @@ class FAQController extends AbstractController
     /**
      * @Route("/question/{id}", name="question")
      */
-    public function question($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager): Response
+    public function question($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, AnswerRepository $answerRepository, EntityManagerInterface $entityManager): Response
     {
         $question = $questionRepository->find($id);
 
@@ -68,6 +74,12 @@ class FAQController extends AbstractController
         //Handling of submission of new answer
         $this->handleAnswerFormSubmission($answerForm, $question, $entityManager, $answer);
 
+        //Modify answer form
+        $modifyAnswerForm = $this->createForm(ModifyAnswerFormType::class);
+        $modifyAnswerForm->handleRequest($request);
+        //Handling of submission of modifying an answer
+        $this->handleModifyAnswerFormSubmission($modifyAnswerForm, $answerRepository, $entityManager);
+
         $hasAdminRightToDeleteQuestion = false;
         if($this->isGranted('IS_AUTHENTICATED_REMEMBERED'))
         {
@@ -83,7 +95,8 @@ class FAQController extends AbstractController
             'question' => $question,
             'questionForm' => $questionForm->createView(),
             'hasAdminRightToDeleteQuestion' => $hasAdminRightToDeleteQuestion,
-            'answerForm' => $answerForm->createView()
+            'answerForm' => $answerForm->createView(),
+            'modifyAnswerForm' => $modifyAnswerForm->createView()
         ]);
     }
 
@@ -105,7 +118,7 @@ class FAQController extends AbstractController
             {
                 $moderatedFAQs = $currentUser->getModeratedFAQs();
                 $belongingsFAQs = $question->getBelongingFAQs();
-                if($this->isGranted('ROLE_ADMIN') && !$this->hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs))
+                if(!$this->hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs))
                 {
                     $this->addFlash('delete_question_error', 'You don\'t have the right to delete the question.');
                     $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
@@ -116,6 +129,44 @@ class FAQController extends AbstractController
             $this->addFlash('delete_question_success', 'The requested question has successfully been removed.');
         }
         return $this->redirectToRoute('faq_main');
+    }
+
+    /**
+     * @Route("/delete-answer/{question_id}/{answer_id}", name="delete_answer")
+     */
+    public function deleteAnswer($question_id, $answer_id, AnswerRepository $answerRepository, UserRepository $userRepository, EntityManagerInterface $entityManager)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $answer = $answerRepository->find($answer_id);
+        $currentUser = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        if($answer == null)
+        {
+            $this->addFlash('delete_answer_error', 'The requested answer doesn\'t exist.');
+            return $this->redirectToRoute('question', ['id' => $question_id]);
+        }
+        $question = $answer->getRelatedQuestion();
+        if($answer->getEditor() != $currentUser)
+        {
+            if(!$this->isGranted('ROLE_SUPERADMIN') && !$this->isGranted('ROLE_ADMIN'))
+            {
+                $this->addFlash('delete_answer_error', 'You don\'t have the right to delete the question.');
+                return $this->redirectToRoute('question', ['id' => $question_id]);
+            } 
+            if($this->isGranted('ROLE_ADMIN'))
+            {
+                $moderatedFAQs = $currentUser->getModeratedFAQs();
+                $belongingsFAQs = $question->getBelongingFAQs();
+                if(!$this->hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs))
+                {
+                    $this->addFlash('delete_answer_error', 'You don\'t have the right to delete the question.');
+                    return $this->redirectToRoute('question', ['id' => $question_id]);
+                }
+            }
+        }
+        $entityManager->remove($answer);
+        $entityManager->flush();
+        $this->addFlash('delete_answer_success', 'The requested question has successfully been removed.');
+        return $this->redirectToRoute('question', ['id' => $question_id]);
     }
 
     /**
@@ -269,12 +320,36 @@ class FAQController extends AbstractController
                 $entityManager->persist($answer);
                 $entityManager->flush();
                 $this->addFlash('new_answer_success', 'The answer has successfully been added.');
-                $answer = new Answer();
             }
             else
-            {
                 $this->addFlash('new_answer_error', 'Error while trying to add the answer.');
+        }
+    }
+
+    private function handleModifyAnswerFormSubmission(Form $form, AnswerRepository $answerRepository, EntityManagerInterface $entityManager)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $answer = $answerRepository->find($form->get('answer_id')->getData());
+                if($answer == null)
+                {
+                    $this->addFlash('modify_answer_error', 'The submitted answer doesn\'t exist.');
+                    return;
+                }
+                if($answer->getEditor()->getEmail() != $this->getUser()->getUserIdentifier())
+                {
+                    $this->addFlash('modify_answer_error', 'You aren\'t the creator of the answer.');
+                    return;
+                }
+                $answer->setContent($form->get('content')->getData());
+                $entityManager->persist($answer);
+                $entityManager->flush();
+                $this->addFlash('modify_answer_success', 'The answer was successfully been updated.');
             }
+            else
+                $this->addFlash('modify_answer_invalid_error', 'Error while trying to modify the answer : invalid form.');
         }
     }
         
@@ -294,11 +369,32 @@ class FAQController extends AbstractController
 
     private function hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs)
     {
+        if($this->isGranted('ROLE_SUPERADMIN'))
+            return true;
         foreach($moderatedFAQs as $moderatedFAQ)
         {
             if($belongingsFAQs->contains($moderatedFAQ))
                 return true;
         }
         return false;
+    }
+
+    public function renderDeleteButton($question_id, UserRepository $userRepository, QuestionRepository $questionRepository):Response
+    {
+        $question = $questionRepository->find($question_id);
+        if($question == null)
+            return new Response('');
+        $belongingsFAQs = $question->getBelongingFAQs();
+        if($this->isGranted('ROLE_USER'))
+        {
+            $currentUser = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+            $moderatedFAQs = $currentUser->getModeratedFAQs();
+        }
+        if($this->isGranted('ROLE_SUPERADMIN') || ($this->isGranted('ROLE_ADMIN') && $this->hasRightToDeleteQuestion($moderatedFAQs, $belongingsFAQs)) || ($this->isGranted('ROLE_USER') && $question->getCreator() == $this->getUser()))
+            return $this->render('faq/delete_question_button.html.twig', [
+                'question' => $question
+            ]);
+        else
+            return new Response('');
     }
 }
