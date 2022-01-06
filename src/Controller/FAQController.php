@@ -172,9 +172,8 @@ class FAQController extends AbstractController
     /**
      * @Route("/like-question-{id}", name="like_question", methods={"POST"})
      * @Route("/dislike-question-{id}", name="dislike_question", methods={"POST"})
-     * @Route("/undodislike-question-{id}", name="undodislike_question", methods={"POST"})
      */
-    public function toggleLikesAjax($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager): Response
+    public function toggleLikesQuestionAjax($id, Request $request, UserRepository $userRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $question = $questionRepository->find($id);
@@ -215,20 +214,97 @@ class FAQController extends AbstractController
     }
 
     /**
-     * @Route("/check-liking-question-{id}", name="check_liking_question", methods={"POST"})
+     * @Route("/like-answer-{id}", name="like_answer", methods={"POST"})
+     * @Route("/dislike-answer-{id}", name="dislike_answer", methods={"POST"})
      */
-    public function checkLikes($id, QuestionRepository $questionRepository, UserRepository $userRepository): Response
+    public function toggleLikesAnswerAjax($id, Request $request, UserRepository $userRepository, AnswerRepository $answerRepository, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $answer = $answerRepository->find($id);
+        if($answer == null)
+            return $this->json(['action' => 'error', 'id' => $id]);
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $result = '';
+        switch($request->get('_route'))
+        {
+            case 'like_answer':
+                if($answer->getLikingUsers()->contains($user))
+                {
+                    $answer->removeLikingUser($user);
+                    $result = 'unliked';
+                }
+                else
+                {
+                    $answer->addLikingUser($user);
+                    $result = 'liked';
+                }
+                break;
+            case 'dislike_answer':
+                if($answer->getDislikingUsers()->contains($user))
+                {
+                    $answer->removeDislikingUser($user);
+                    $result = 'undodisliked';
+                }
+                else
+                {
+                    $answer->addDislikingUser($user);
+                    $result = 'disliked';
+                }
+                break;
+        }
+        $entityManager->persist($answer);
+        $entityManager->flush();
+        return $this->json(['action' => $result, 'id' => $id]);
+    }
+
+    /**
+     * @Route("/check-liking-question-{id}", name="check_liking_question", methods={"POST"})
+     * @Route("/check-disliking-question-{id}", name="check_disliking_question", methods={"POST"})
+     */
+    public function checkQuestionLikes($id, Request $request, QuestionRepository $questionRepository, UserRepository $userRepository): Response
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $question = $questionRepository->find($id);
         if($question == null)
-            return $this->json(['like' => 'false', 'dislike' => 'false']);
+            return $this->json(['like' => 'false']);
         $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
-        if($user->getLikedQuestions()->contains($question))
-            return $this->json(['like' => 'true', 'dislike' => 'false']);
-        if($user->getDislikedQuestions()->contains($question))
-            return $this->json(['like' => 'false', 'dislike' => 'true']);
-        return $this->json(['like' => 'false', 'dislike' => 'false']);
+        switch($request->get('_route'))
+        {
+            case 'check_liking_question':
+                if($user->getLikedQuestions()->contains($question))
+                    return $this->json(['like' => 'true']);
+                break;
+            case 'check_disliking_question':
+                if($user->getDislikedQuestions()->contains($question))
+                    return $this->json(['like' => 'true']);
+                break;
+        }
+        return $this->json(['like' => 'false']);
+    }
+
+    /**
+     * @Route("/check-liking-answer-{id}", name="check_liking_answer", methods={"POST"})
+     * @Route("/check-disliking-answer-{id}", name="check_disliking_answer", methods={"POST"})
+     */
+    public function checkAnswerLikes($id, Request $request, AnswerRepository $answerRepository, UserRepository $userRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $answer = $answerRepository->find($id);
+        if($answer == null)
+            return $this->json(['like' => 'false']);
+        $user = $userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        switch($request->get('_route'))
+        {
+            case 'check_liking_answer':
+                if($user->getLikedAnswers()->contains($answer))
+                    return $this->json(['like' => 'true']);
+                break;
+            case 'check_disliking_answer':
+                if($user->getDislikedAnswers()->contains($answer))
+                    return $this->json(['like' => 'true']);
+                break;
+        }
+        return $this->json(['like' => 'false']);
     }
 
     /**

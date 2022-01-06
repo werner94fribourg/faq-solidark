@@ -132,6 +132,8 @@ class Answer
             $this->likingUsers[] = $likingUser;
         }
 
+        $this->removeDislikingUser($likingUser);
+
         return $this;
     }
 
@@ -156,6 +158,8 @@ class Answer
             $this->dislikingUsers[] = $dislikingUser;
         }
 
+        $this->removeLikingUser($dislikingUser);
+        
         return $this;
     }
 
