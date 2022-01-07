@@ -3,5 +3,8 @@
   <div class="col-lg-8"></div>
   <div class="col-lg-4 mb-2">
     <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      <button type="button" id="assign_question_faq_form_button-{{question.id}}" class="btn btn-primary form-button mb-2" onclick="showAssignQuestionFAQFormModal({{question.id}})">FAQ</button>
+    {% endif %}
   </div>
 </div>

@@ -6,6 +6,8 @@ use App\Entity\Answer;
 use App\Entity\FAQ;
 use App\Entity\Question;
 use App\Form\AnswerFormType;
+use App\Form\AssignQuestionFAQFormType;
+use App\Form\AssignQuestionFormType;
 use App\Form\FaqFormType;
 use App\Form\ModifyAnswerFormType;
 use App\Form\QuestionFormType;
@@ -41,6 +43,13 @@ class FAQController extends AbstractController
         $questionForm->handleRequest($request);
         //Handling of submission of new question
         $this->handleQuestionFormSubmission($questionForm, $entityManager, $question);
+        
+        //Form to modify the faq affectation of a question
+        $assignQuestionFAQForm = $this->createForm(AssignQuestionFAQFormType::class);
+        $assignQuestionFAQForm->handleRequest($request);
+        //Handling of submission of modification of faq affectation
+        $this->handleAssignQuestionFAQFormSubmission($assignQuestionFAQForm, $questionRepository, $entityManager);
+
         //List of entities to show on the dashboard
         $questions = $questionRepository->findBy([], ['creationDate' => 'DESC']);
         $faqs = $fAQRepository->findBy([], ['name' => 'ASC']);
@@ -48,6 +57,7 @@ class FAQController extends AbstractController
         
         return $this->render('faq/faq_main.html.twig', [
             'questionForm' => $questionForm->createView(),
+            'assignQuestionFAQForm' => $assignQuestionFAQForm->createView(),
             'questions' => $questions,
             'faqs' => $faqs,
             'users' => $users
@@ -129,6 +139,32 @@ class FAQController extends AbstractController
             $this->addFlash('delete_question_success', 'The requested question has successfully been removed.');
         }
         return $this->redirectToRoute('faq_main');
+    }
+
+    /**
+     * @Route("/delete-question-faq/{faq_id}/{question_id}", name="delete_question_faq")
+     */
+    public function deleteQuestionFAQ($faq_id, $question_id, FAQRepository $fAQRepository, QuestionRepository $questionRepository, EntityManagerInterface $entityManager)
+    {
+        $this->denyAccessUnlessGranted('ROLE_SUPERADMIN');
+        $faq = $fAQRepository->find($faq_id);
+        $question = $questionRepository->find($question_id);
+        if($question == null)
+        {
+            $this->addFlash('delete_question_faq_error', 'The requested question doesn\'t exist.');
+        }
+        else if($faq == null )
+        {
+            $this->addFlash('delete_question_faq_error', 'The requested faq doesn\'t exist.');
+        }
+        else
+        {
+            $faq->removeRelatedQuestion($question);
+            $entityManager->persist($faq);
+            $entityManager->flush();
+            $this->addFlash('delete_question_faq_success', 'The requested question was removed from the faq.');
+        }
+        return $this->redirectToRoute('faq', ['id' => $faq_id]);
     }
 
     /**
@@ -308,6 +344,21 @@ class FAQController extends AbstractController
     }
 
     /**
+     * @Route("/check-faq-belonging/{faq_id}/{question_id}", name="check_faq_belonging", methods={"POST"})
+     */
+    public function checkFAQBelonging($faq_id, $question_id, FAQRepository $fAQRepository, QuestionRepository $questionRepository):Response
+    {
+        $faq = $fAQRepository->find($faq_id);
+        $question = $questionRepository->find($question_id);
+        if($faq != null && $question != null)
+        {
+            if($question->getBelongingFAQs()->contains($faq))
+                return $this->json(['belonging' => true]);
+        }
+        return $this->json(['belonging' => false]);
+    }
+
+    /**
      * @Route("/faq/{id}", name="faq", requirements={"id"="\d+"})
      */
     public function faq($id, Request $request, FAQRepository $fAQRepository, EntityManagerInterface $entityManager): Response
@@ -324,9 +375,15 @@ class FAQController extends AbstractController
         $faqForm->handleRequest($request);
         //Handling of submission of modifying the faq
         $this->handleModifyFaqFormSubmission($faqForm, $entityManager, $faq);
+        //Form to assign questions to the faq
+        $assignQuestionForm = $this->createForm(AssignQuestionFormType::class, null, ['faq' => $faq]);
+        $assignQuestionForm->handleRequest($request);
+        //Handling of submission of assigning a question to the faq
+        $this->handleAssignQuestionFormSubmission($assignQuestionForm, $entityManager, $faq);
         return $this->render('faq/faq.html.twig', [
             'faq' => $faq,
-            'faqForm' => $faqForm->createView()
+            'faqForm' => $faqForm->createView(),
+            'assignQuestionFAQForm' => $assignQuestionForm->createView()
         ]);
     }
 
@@ -335,10 +392,17 @@ class FAQController extends AbstractController
      */
     public function unassignedQuestions(Request $request ,QuestionRepository $questionRepository, EntityManagerInterface $entityManager)
     {
+        //Form to modify the faq affectation of a question
+        $assignQuestionFAQForm = $this->createForm(AssignQuestionFAQFormType::class);
+        $assignQuestionFAQForm->handleRequest($request);
+        //Handling of submission of modification of faq affectation
+        $this->handleAssignQuestionFAQFormSubmission($assignQuestionFAQForm, $questionRepository, $entityManager);
+
+        //Unassigned questions
         $unassignedQuestions = $this->getUnassignedQuestions($questionRepository);
-        
         return $this->render('faq/unassigned_questions.html.twig', [
-            'unassignedQuestions' => $unassignedQuestions
+            'unassignedQuestions' => $unassignedQuestions,
+            'assignQuestionFAQForm' => $assignQuestionFAQForm->createView()
         ]);
     }
 
@@ -426,6 +490,52 @@ class FAQController extends AbstractController
             }
             else
                 $this->addFlash('modify_answer_invalid_error', 'Error while trying to modify the answer : invalid form.');
+        }
+    }
+
+    private function handleAssignQuestionFAQFormSubmission(Form $form, QuestionRepository $questionRepository, EntityManagerInterface $entityManager)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $question = $questionRepository->find($form->get('question_id')->getData());
+                if($question == null)
+                    $this->addFlash('assign_question_faq_error', 'The requested submitted question doesn\'t exist.');
+                else
+                {
+                    $faqs = $form->get('faq')->getData();
+                    foreach($faqs as $faq)
+                    {
+                        $question->addBelongingFAQ($faq);
+                    }
+                    $entityManager->persist($question);
+                    $entityManager->flush();
+                    $this->addFlash('assign_question_faq_success', 'The faqs were successfully assigned to the question.');
+                }
+            }
+            else
+                $this->addFlash('assign_question_faq_error', 'Error while trying to modify the assignation of the question : invalid form.');
+        }
+    }
+
+    private function handleAssignQuestionFormSubmission(Form $form, EntityManagerInterface $entityManager, FAQ $faq)
+    {
+        if($form->isSubmitted())
+        {
+            if($form->isValid())
+            {
+                $questions = $form->get('questions')->getData();
+                foreach($questions as $question)
+                {
+                    $faq->addRelatedQuestion($question);
+                }
+                $entityManager->persist($faq);
+                $entityManager->flush();
+                $this->addFlash('assign_question_faq_success', 'The questions were successfullly assigned to the faq.');
+            }
+            else
+                $this->addFlash('assign_question_faq_error', 'Error while trying to assign the questions to the faq.');
         }
     }
         
