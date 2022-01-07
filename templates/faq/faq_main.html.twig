@@ -48,6 +48,22 @@
       </button>
     </div>
   {% endfor %}
+  {% for error in app.flashes('assign_question_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('assign_question_faq_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
   {{parent()}}
 {% endblock %}
 
@@ -161,6 +177,42 @@
             </div>
           {% endfor %}
         </div>
+        {% if is_granted('ROLE_SUPERADMIN') %}
+          <button type="button" id="assign_question_faq_form_button" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assign_question_faq_form_modal" style="display:none;">FAQ</button>
+          <div class="modal fade" id="assign_question_faq_form_modal" tabindex="-1" aria-labelledby="assign_question_faq_form_button" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="assign_question_faq_form_label">New Assignment</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  {{form_start(assignQuestionFAQForm, {'attr': {'class': 'needs-validation', 'id': 'assign_question_faq_form'}})}}
+                    <div class="mb-3">
+                      <label for="assign_question_faq_form_faq" class="form-label">FAQ</label>
+                      <div id="assign_question_faq_form_faq">
+                        {% for checkbox in assignQuestionFAQForm.faq.children %}
+                          <div class="form-check form-check-inline">
+                            {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                            {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                          </div>
+                        {% endfor %}
+                      </div>
+                      <div id="assign_question_faq_form_faq_error" class="invalid-feedback">
+                        {{form_errors(assignQuestionFAQForm.faq)}}
+                      </div>
+                    </div>
+                    {{form_widget(assignQuestionFAQForm.question_id, {'attr': {'style': 'display:none;'}})}}
+                  {{form_end(assignQuestionFAQForm)}}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" form="assign_question_faq_form" class="btn btn-primary">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div><!-- end tab-pane -->
     <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="tags-tab">
@@ -185,6 +237,14 @@
                 <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
                   <p class="lh-18">{{faq.relatedQuestions|length}} questions</p>
                 </div>
+                {% if is_granted('ROLE_SUPERADMIN') %}
+                  <div class="row mb-4">
+                    <div class="col-lg-8"></div>
+                    <div class="col-lg-4 mb-2">
+                      <a class="form-button delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                    </div>
+                  </div>
+                {% endif %}
               </div>
             </div>
           {% endfor %}
@@ -240,6 +300,28 @@
     {% if newQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();
+    {% endif %}
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      function showAssignQuestionFAQFormModal(question_id)
+      {
+        $('#assign_question_faq_form_faq').find('.form-check-input').each(function(){
+          var faq_id = $(this).val();
+          var tag = $(this);
+          $.ajax({
+            method: 'POST',
+            url: '/faqs/check-faq-belonging/'+faq_id+'/'+question_id
+          }).done(function(data){
+            if(data.belonging){
+              tag.attr('checked', true);
+              }
+              else {
+                tag.attr('checked', false);
+              }
+            })
+          });
+        $('#assign_question_faq_form_button')[0].click();
+        $('#assign_question_faq_form_question_id').val(question_id);
+      }
     {% endif %}
   </script>
 {% endblock %}
