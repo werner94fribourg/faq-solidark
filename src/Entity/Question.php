@@ -54,18 +54,21 @@ class Question
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedQuestions")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="questions_likes")
      */
     private $likingUsers;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="dislikedQuestions")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="questions_dislikes")
      */
     private $dislikingUsers;
 
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="relatedQuestion", orphanRemoval=true)
+     * @ORM\OrderBy({"creationDate" = "DESC"})
      */
     private $answers;
 
@@ -168,6 +171,8 @@ class Question
             $this->likingUsers[] = $likingUser;
         }
 
+        $this->removeDislikingUser($likingUser);
+
         return $this;
     }
 
@@ -191,6 +196,8 @@ class Question
         if (!$this->dislikingUsers->contains($dislikingUser)) {
             $this->dislikingUsers[] = $dislikingUser;
         }
+
+        $this->removelikingUser($dislikingUser);
 
         return $this;
     }

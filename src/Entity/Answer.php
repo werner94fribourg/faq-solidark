@@ -41,13 +41,20 @@ class Answer
     private $editor;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    private $creationDate;
+
+    /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="likedAnswers")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="answers_likes")
      */
     private $likingUsers;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="dislikedAnswers")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="answers_dislikes")
      */
     private $dislikingUsers;
@@ -74,7 +81,7 @@ class Answer
 
         return $this;
     }
-
+    
     public function getRelatedQuestion(): ?Question
     {
         return $this->relatedQuestion;
@@ -99,6 +106,18 @@ class Answer
         return $this;
     }
 
+    public function getCreationDate(): ?\DateTimeInterface
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(\DateTimeInterface $creationDate): self
+    {
+        $this->creationDate = $creationDate;
+
+        return $this;
+    }
+
     /**
      * @return Collection|User[]
      */
@@ -112,6 +131,8 @@ class Answer
         if (!$this->likingUsers->contains($likingUser)) {
             $this->likingUsers[] = $likingUser;
         }
+
+        $this->removeDislikingUser($likingUser);
 
         return $this;
     }
@@ -137,6 +158,8 @@ class Answer
             $this->dislikingUsers[] = $dislikingUser;
         }
 
+        $this->removeLikingUser($dislikingUser);
+        
         return $this;
     }
 

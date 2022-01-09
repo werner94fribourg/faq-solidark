@@ -1,0 +1,140 @@
+{% extends 'faq/base.html.twig' %}
+
+{% block title %}Unassigned questions{% endblock %}
+
+{% block main %}
+  {% for error in app.flashes('assign_question_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('assign_question_faq_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
+
+{% block faqcontent %}
+  <div class="row mb-4 mt-2">
+    <h3>List of unassigned questions</h3>
+  </div>
+  <div class="question-list">
+    {% for question in unassignedQuestions %}
+      <div id="question-{{question.id}}" class="media-card align-items-center">
+        <div class="votes">
+          <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+            {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
+            {% if votes_count >= 0 %}
+              <span class="vote-counts up ">{{votes_count}}</span>
+              <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+            {% else %}
+              <span class="vote-counts down">{{votes_count|abs}}</span>
+              <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+            {% endif %}
+          </div>
+          <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+            <span class="vote-counts">{{question.answers|length}}</span>
+            <span class="answer-icon"></span>
+          </div>
+        </div>
+        <div class="media-body">
+          <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
+          <small class="meta">
+            <span class="pr-1">{{question.creationDate|ago}}</span>
+            <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
+          </small>
+          <div class="tags">
+            {% for belongingFaq in question.belongingFAQs %}
+              <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+            {% endfor %}
+          </div>
+          {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id)) %}
+            <hr>
+            <div class="row mb-4">
+              <div class="col-lg-8"></div>
+              <div class="col-lg-4 mb-2">
+                <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                {% if is_granted('ROLE_SUPERADMIN') %}
+                  <button type="button" id="assign_question_faq_form_button-{{question.id}}" class="btn btn-primary form-button mb-2" onclick="showAssignQuestionFAQFormModal({{question.id}})">FAQ</button>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      <button type="button" id="assign_question_faq_form_button" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assign_question_faq_form_modal" style="display:none;">FAQ</button>
+      <div class="modal fade" id="assign_question_faq_form_modal" tabindex="-1" aria-labelledby="assign_question_faq_form_button" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="assign_question_faq_form_label">New Assignment</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              {{form_start(assignQuestionFAQForm, {'attr': {'class': 'needs-validation', 'id': 'assign_question_faq_form'}})}}
+                <div class="mb-3">
+                  <label for="assign_question_faq_form_faq" class="form-label">FAQ</label>
+                  <div id="assign_question_faq_form_faq">
+                    {% for checkbox in assignQuestionFAQForm.faq.children %}
+                      <div class="form-check form-check-inline">
+                        {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                        {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                      </div>
+                    {% endfor %}
+                  </div>
+                  <div id="assign_question_faq_form_faq_error" class="invalid-feedback">
+                    {{form_errors(assignQuestionFAQForm.faq)}}
+                  </div>
+                </div>
+                {{form_widget(assignQuestionFAQForm.question_id, {'attr': {'style': 'display:none;'}})}}
+              {{form_end(assignQuestionFAQForm)}}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" form="assign_question_faq_form" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    $('#unassigned_questions_link').addClass("active");
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      function showAssignQuestionFAQFormModal(question_id)
+      {
+        $('#assign_question_faq_form_faq').find('.form-check-input').each(function(){
+          var faq_id = $(this).val();
+          var tag = $(this);
+          $.ajax({
+            method: 'POST',
+            url: '/faqs/check-faq-belonging/'+faq_id+'/'+question_id
+          }).done(function(data){
+            if(data.belonging){
+              tag.attr('checked', true);
+              }
+              else {
+                tag.attr('checked', false);
+              }
+            })
+          });
+        $('#assign_question_faq_form_button')[0].click();
+        $('#assign_question_faq_form_question_id').val(question_id);
+      }
+    {% endif %}
+  </script>
+{% endblock %}

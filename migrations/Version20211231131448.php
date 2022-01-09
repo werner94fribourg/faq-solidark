@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20211225115806 extends AbstractMigration
+final class Version20211231131448 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,7 +20,7 @@ final class Version20211225115806 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE answers (id INT AUTO_INCREMENT NOT NULL, related_question_id INT NOT NULL, editor_id INT NOT NULL, content LONGTEXT NOT NULL, INDEX IDX_50D0C606D5CC883B (related_question_id), INDEX IDX_50D0C6066995AC4C (editor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE answers (id INT AUTO_INCREMENT NOT NULL, related_question_id INT NOT NULL, editor_id INT NOT NULL, content LONGTEXT NOT NULL, creation_date DATETIME NOT NULL, INDEX IDX_50D0C606D5CC883B (related_question_id), INDEX IDX_50D0C6066995AC4C (editor_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE answers_likes (answer_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_3916CBAEAA334807 (answer_id), INDEX IDX_3916CBAEA76ED395 (user_id), PRIMARY KEY(answer_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE answers_dislikes (answer_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_6BADC7F9AA334807 (answer_id), INDEX IDX_6BADC7F9A76ED395 (user_id), PRIMARY KEY(answer_id, user_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE faqs (id INT AUTO_INCREMENT NOT NULL, moderator_id INT DEFAULT NULL, name VARCHAR(45) NOT NULL, description LONGTEXT NOT NULL, INDEX IDX_8934BEE5D0AFA354 (moderator_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');

@@ -97,6 +97,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Question::class, mappedBy="creator", orphanRemoval=true)
+     * @ORM\OrderBy({"creationDate" = "DESC"})
      */
     private $askedQuestions;
 

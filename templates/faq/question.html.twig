@@ -1,39 +1,187 @@
 {% extends 'faq/base.html.twig' %}
+{% if app.session.flashbag.peek('question_error')|length > 0 %}
+  {% set modifyQuestionAttempt = true %}
+{% else %}
+  {% set modifyQuestionAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('new_answer_error')|length > 0 %}
+  {% set newAnswerAttempt = true %}
+{% else %}
+  {% set newAnswerAttempt = false %}
+{% endif %}
+{% if app.session.flashbag.peek('modify_answer_invalid_error')|length > 0 %}
+  {% set modifyAnswerAttempt = true %}
+{% else %}
+  {% set modifyAnswerAttempt = false %}
+{% endif %}
 
 {% block title %}Question{% endblock %}
+
+{% block main %}
+  {% for error in app.flashes('question_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('new_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('new_answer_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('modify_answer_invalid_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('modify_answer_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_answer_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_answer_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {{parent()}}
+{% endblock %}
 
 {% block faqcontent %}
   <div class="row">
     <div class="media-card align-items-center">
       <div class="votes">
         <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-          <span class="vote-counts up">0</span>
-          <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+          <span id="question-vote-like-{{question.id}}" class="vote-counts up" data-url="{{path('check_liking_question', {'id':question.id})}}">{{question.likingUsers|length}}</span>
+          <span class="vote-icon">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-up" href="{{path('like_question', {'id': question.id})}}" data-like-tag="#question-vote-like-{{question.id}}" data-dislike-tag="#question-vote-dislike-{{question.id}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-up"></span>{% endif %}</span>
         </div>
         <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-          <span class="vote-counts down">0</span>
-          <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+          <span id="question-vote-dislike-{{question.id}}" class="vote-counts down" data-url="{{path('check_disliking_question', {'id':question.id})}}">{{question.dislikingUsers|length}}</span>
+          <span class="vote-icon down">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-down" href="{{path('dislike_question', {'id': question.id})}}" data-like-tag="#question-vote-like-{{question.id}}" data-dislike-tag="#question-vote-dislike-{{question.id}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-down"></span>{% endif %}</span>
         </div>
       </div>
       <div class="media-body">
-        <h5><a href="#">Question title</a></h5>
+        <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
         <small class="meta">
-          <span class="pr-1">1 hour ago</span>
-          <a href="#" class="author">User profile</a>
+          <span class="pr-1">{{question.creationDate|ago}}</span>
+          <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
         </small>
         <div class="tags">
-          <a href="#" class="tag-link">FAQ 1</a>
-          <a href="#" class="tag-link">FAQ 2</a>
-          <a href="#" class="tag-link">FAQ 3</a>
-          <a href="#" class="tag-link">FAQ 4</a>
+          {% for belongingFaq in question.belongingFAQs %}
+            <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
+          {% endfor %}
         </div>
         <hr>
         <div class="question-content">
           <div class="question-post-body">
-            <p>I'm not able to get the data attribute from a button element.</p>
-            <p>How Can I do it ? </p>
+            {{question.content}}
           </div>
         </div>
+        {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id or hasAdminRightToDeleteQuestion)) %}
+          <div class="row mb-4">
+            <div class="col-lg-10"></div>
+            <div class="col-lg-2">
+              <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if app.user.id == question.creator.id %}
+                <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-pencil"></span></a>
+                <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" style="display: none;" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="faq_form_label">Modify Question</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
+                          <div class="mb-3">
+                            <label for="question_form_title" class="form-label">Title</label>
+                            {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
+                            <div id="question_form_title_error" class="invalid-feedback">
+                              {{form_errors(questionForm.title)}}
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="question_form_content" class="form-label">Content</label>
+                            {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
+                            <div id="content_error" class="invalid-feedback">
+                              {{form_errors(questionForm.content)}}
+                            </div>
+                          </div>
+                          <div class="mb-3">
+                            <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
+                            <br>
+                            <div id="question_form_belongingFAQs">
+                              {% for checkbox in questionForm.belongingFAQs.children %}
+                                <div class="form-check form-check-inline">
+                                  {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                                  {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                                </div>
+                              {% endfor %}
+                            </div>
+                            {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
+                            <div id="question_form_belongingFAQs_error" class="invalid-feedback">
+                              {{form_errors(questionForm.belongingFAQs)}}
+                            </div>
+                          </div>
+                        {{form_end(questionForm)}}
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -42,57 +190,206 @@
       <h5 class="h3">Answers</h5>
     </div>
     <div class="col-lg-2">
-      <a type="button" id="answerButton" class="form-button" data-bs-toggle="modal" data-bs-target="#answerModal"><span class="glyphicon glyphicon-plus"></span></a>
-      <div class="modal fade" id="answerModal" tabindex="-1" aria-labelledby="answerButton" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">New answer</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="answerForm" class="register-form needs-validation" novalidate>
-                <div class="mb-3">
-                  <label for="content" class="form-label">Content</label>
-                  <textarea class="form-control" id="content" rows="4" required></textarea>
-                  <div id="content_error" class="invalid-feedback">Content error message.</div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" form="answerForm" class="btn btn-primary">Save changes</button>
+      {% if is_granted('ROLE_USER') %}
+        <a type="button" id="answer_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#answer_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+        <div class="modal fade" id="answer_form_modal" tabindex="-1" aria-labelledby="answer_form_button" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="answer_form_label">New answer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                {{form_start(answerForm, {'attr': {'class': 'needs-validation', 'id': 'answer_form'}})}}
+                  <div class="mb-3">
+                    <label for="answer_form_content" class="form-label">Content</label>
+                    {{form_widget(answerForm.content, {'attr': {'class': 'form-control'}})}}
+                    <div id="answer_form_content_error" class="invalid-feedback">
+                      {{form_errors(answerForm.content)}}
+                    </div>
+                  </div>
+                {{form_end(answerForm)}}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="answer_form" class="btn btn-primary">Save changes</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      {% endif %}
     </div>
   </div>
   <hr>
   <div class="answer-list">
-    <div class="row">
-      <div class="media-card align-items-center">
-        <div class="votes">
-          <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
-            <span class="vote-counts up">0</span>
-            <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
+    {% for answer in question.answers %}
+      <div class="row">
+        <div id="question-{{answer.id}}" class="media-card align-items-center">
+          <div class="votes">
+            <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
+              <span id="answer-vote-like-{{answer.id}}" class="answer vote-counts up" data-url="{{path('check_liking_answer', {'id':answer.id})}}">{{answer.likingUsers|length}}</span>
+              <span class="vote-icon">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-up" href="{{path('like_answer', {'id': answer.id})}}" data-like-tag="#answer-vote-like-{{answer.id}}" data-dislike-tag="#answer-vote-dislike-{{answer.id}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-up"></span>{% endif %}</span>
+            </div>
+            <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
+              <span id="answer-vote-dislike-{{answer.id}}" class="answer vote-counts down" data-url="{{path('check_disliking_answer', {'id':answer.id})}}">{{answer.dislikingUsers|length}}</span>
+              <span class="vote-icon down">{% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}<a class="glyphicon glyphicon-thumbs-down" href="{{path('dislike_answer', {'id': answer.id})}}" data-like-tag="#answer-vote-like-{{answer.id}}" data-dislike-tag="#answer-vote-dislike-{{answer.id}}"></a>{% else %}<span class="glyphicon glyphicon-thumbs-down"></span>{% endif %}</span></span>
+            </div>
           </div>
-          <div class="answer-block d-flex align-items-center justify-content-between" title="Answers">
-            <span class="vote-counts down">0</span>
-            <span class="vote-icon down"><span class="glyphicon glyphicon-thumbs-down"></span></span>
+          <div class="media-body">
+            <h5><a href="#">{{answer.editor.username}}</a></h5>
+            <small class="meta">
+              <span class="pr-1">{{answer.creationDate|ago}}</span>
+            </small>
+            <hr>
+            <div class="answer-content">{{answer.content}}</div>
+            {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (hasAdminRightToDeleteQuestion or app.user.id == answer.editor.id)) %}
+              <a class="form-button delete_answer" href="{{path('delete_answer', {'question_id': question.id, 'answer_id': answer.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+              {% if app.user.id == answer.editor.id %}
+                <a type="button" id="answer_form_button-{{answer.id}}" class="form-button" onclick="showAnswerModal({{answer.id}})"><span class="glyphicon glyphicon-pencil"></span></a>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
-        <div class="media-body">
-          <h5><a href="#">werner94fribourg</a></h5>
-          <small class="meta">
-            <span class="pr-1">1 hour ago</span>
-          </small>
-          <hr>
-          <div class="answer-content">
-            First answer
+      </div>
+    {% endfor %}
+  </div>
+  {% if app.user != null %}
+    <a type="button" id="modify_answer_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#modify_answer_form_modal" style="display:none;"><span class="glyphicon glyphicon-pencil"></span></a>
+    <div class="modal fade" id="modify_answer_form_modal" aria-labelledby="modify_answer_form_button" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="answer_form_label">Modify Answer</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            {{form_start(modifyAnswerForm, {'attr': {'class': 'needs-validation', 'id': 'modify_answer_form'}})}}
+              <div class="mb-3">
+                <label for="question_form_title" class="form-label">Title</label>
+                {{form_widget(modifyAnswerForm.content, {'attr': {'class': 'form-control'}})}}
+                <div id="question_form_title_error" class="invalid-feedback">
+                  {{form_errors(modifyAnswerForm.content)}}
+                </div>
+              </div>
+              {{form_widget(modifyAnswerForm.answer_id, {'attr': {'style': 'display:none;'}})}}
+            {{form_end(modifyAnswerForm)}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" form="modify_answer_form" class="btn btn-primary">Save changes</button>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
+{% endblock %}
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    $('.vote-counts').each(function(){
+      var $url = $(this).attr('data-url');
+      var tag = $(this);
+      if($url !== undefined)
+      {
+        $.ajax({
+          method: 'POST',
+          url: $url
+        }).done(function(data){
+          if(data.like == 'true')
+            tag.attr('style', 'text-decoration:underline;');
+        })
+      }
+    });
+    {% if newAnswerAttempt %}
+      document.getElementById("answer_form").classList.add("was-validated");
+      $('#answer_form_button')[0].click();
+    {% endif %}
+    {% if modifyQuestionAttempt %}
+      document.getElementById("question_form").classList.add("was-validated");
+      $('#question_form_button')[0].click();
+    {% endif %}
+    {% if modifyAnswerAttempt %}
+      document.getElementById("modify_answer_form").classList.add("was-validated");
+      $('#modify_answer_form_button')[0].click();
+    {% endif %}
+    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+      $('.glyphicon-thumbs-up').click(function(e){
+          e.preventDefault();
+          var url = $(this).attr('href');
+          var likeTag = $($(this).attr('data-like-tag'));
+          var dislikeTag = $($(this).attr('data-dislike-tag'));
+          $.ajax({
+            method: 'POST',
+            url: url
+          }).done(function(data){
+              var val = parseInt(likeTag.html().replace(/[^0-9]/g,''));
+              var result = data.action;
+              if(result == 'liked')
+              {
+                val++;
+                likeTag.html(val);
+                likeTag.attr('style', 'text-decoration:underline;');
+                if(dislikeTag[0].hasAttribute('style'))
+                {
+                  var val = parseInt(dislikeTag.html().replace(/[^0-9]/g,''));
+                  val--;
+                  dislikeTag.html(val);
+                  dislikeTag.removeAttr('style');
+                }
+              }
+              else if(result == 'unliked')
+              {
+                val--;
+                likeTag.html(val);
+                likeTag.removeAttr('style');
+              }
+            }
+          )
+        }
+      )
+      $('.glyphicon-thumbs-down').click(function(e){
+          e.preventDefault();
+          var url = $(this).attr('href');
+          var likeTag = $($(this).attr('data-like-tag'));
+          var dislikeTag = $($(this).attr('data-dislike-tag'));
+          $.ajax({
+            method: 'POST',
+            url: url
+          }).done(function(data){
+              var val = parseInt(dislikeTag.html().replace(/[^0-9]/g,''));
+              var result = data.action;
+              if(result == 'disliked')
+              {
+                val++;
+                dislikeTag.html(val);
+                dislikeTag.attr('style', 'text-decoration:underline;');
+                if(likeTag[0].hasAttribute('style'))
+                {
+                  var val = parseInt(likeTag.html().replace(/[^0-9]/g,''));
+                  val--;
+                  likeTag.html(val);
+                  likeTag.removeAttr('style');
+                }
+              }
+              else if(result == 'undodisliked')
+              {
+                val--;
+                dislikeTag.html(val);
+                dislikeTag.removeAttr('style');
+              }
+            }
+          )
+        }
+      )
+    {% endif %}
+    {% if app.user != null %}
+      function showAnswerModal(answer_id)
+      {
+        $('#modify_answer_form_button')[0].click();
+        var text = $('#question-'+answer_id).find('.answer-content').text();
+        $('#modify_answer_form_content').val(text);
+        $('#modify_answer_form_answer_id').val(answer_id);
+      }
+    {% endif %}
+  </script>
 {% endblock %}

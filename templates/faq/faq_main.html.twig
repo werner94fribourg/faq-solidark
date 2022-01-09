@@ -1,5 +1,5 @@
 {% extends 'faq/base.html.twig' %}
-{% if app.session.flashbag.peek('new_question_error')|length > 0 %}
+{% if app.session.flashbag.peek('question_error')|length > 0 %}
   {% set newQuestionAttempt = true %}
 {% else %}
   {% set newQuestionAttempt = false %}
@@ -16,7 +16,7 @@
       </button>
     </div>
   {% endfor %}
-  {% for error in app.flashes('new_question_error') %}
+  {% for error in app.flashes('question_error') %}
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
       <strong>{{ error }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -24,7 +24,39 @@
       </button>
     </div>
   {% endfor %}
-  {% for flashSuccess in app.flashes('new_question_success') %}
+  {% for flashSuccess in app.flashes('question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('delete_question_error') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('delete_question_success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong>{{ flashSuccess }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for error in app.flashes('assign_question_faq_error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong>{{ error }}</strong>
+      <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+  {% for flashSuccess in app.flashes('assign_question_faq_success') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
       <strong>{{ flashSuccess }}</strong>
       <button type="button" class="close" data-bs-dismiss="alert" aria-label="Close">
@@ -49,51 +81,62 @@
   </ul>
   <div class="tab-content pt-40px" id="myTabContent">
     <div class="tab-pane fade active show" id="questions" role="tabpanel" aria-labelledby="questions-tab">
-      <div class="row project-search">
-        <div class="col-lg-9 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search question">
+      <div class="row align-items-center pb-4">
+        <div class="col-lg-10">
+          <h3>All Questions</h3>
         </div>
-        <div class="col-lg-3 mb-3">
-          <a class="btn theme-btn" data-bs-toggle="collapse" href="#collapseSearchAdvanced" role="button" aria-expanded="true" aria-controls="collapseSearchAdvanced">
-            <i class="la la-gear mr-1"></i> Filters
-          </a>
-        </div>
-        <div class="col-lg-12 mb-3 collapse" id="collapseSearchAdvanced" style="">
-          <div class="search-advanced-item mb-10px">
-            <form>
-              <h4 class="fs-14 pb-2 text-gray text-uppercase">Attributes</h4>
-              <div class="divider"><span></span></div>
-              <div class="pt-3">
-                <div class="row">
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="author">Author</label>
-                    <input id="author" type="text" class="form-control mb-3" name="author">
-                  </div>
-                  <div class="input-box col-lg-6 mb-3">
-                    <label class="form-label fs-13 text-black lh-20 mb-3" for="type">FAQ</label>
-                    <select id="type" class="form-select mb-3" name="type">
-                      <option selected="" value="0">FAQ 0</option>
-                      <option value="1">FAQ 1</option>
-                      <option value="2">FAQ 2</option>
-                      <option value="3">FAQ 3</option>
-                    </select>
+        <div class="col-lg-2">
+            {% if is_granted('ROLE_USER') %}
+              <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
+              <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="question_form_label">New question</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
+                        <div class="mb-3">
+                          <label for="question_form_title" class="form-label">Title</label>
+                          {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
+                          <div id="question_form_title_error" class="invalid-feedback">
+                            {{form_errors(questionForm.title)}}
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="question_form_content" class="form-label">Content</label>
+                          {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
+                          <div id="content_error" class="invalid-feedback">
+                            {{form_errors(questionForm.content)}}
+                          </div>
+                        </div>
+                        <div class="mb-3">
+                          <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
+                          <br>
+                          <div id="question_form_belongingFAQs">
+                            {% for checkbox in questionForm.belongingFAQs.children %}
+                              <div class="form-check form-check-inline">
+                                {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                                {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                              </div>
+                            {% endfor %}
+                          </div>
+                          {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
+                          <div id="question_form_belongingFAQs_error" class="invalid-feedback">
+                            {{form_errors(questionForm.belongingFAQs)}}
+                          </div>
+                        </div>
+                      {{form_end(questionForm)}}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </form>
-          </div><!-- end search-advanced-item -->
-        </div>
-      </div>
-      <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
-          <h3>All Questions</h3>
-        </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option selected="">Newest</option>
-            <option value="1">Votes</option>
-            <option value="2">Unanswered</option>
-          </select>
+            {% endif %}
         </div>
       </div>
       <div class="row">
@@ -104,10 +147,10 @@
                 <div class="vote-block d-flex align-items-center justify-content-between" title="Votes">
                   {% set votes_count = question.likingUsers|length - question.dislikingUsers|length %}
                   {% if votes_count >= 0 %}
-                    <span class="vote-counts up ">{{votes_count}}</span>
+                    <span class="vote-counts up" data-url="{{path('check_liking_question', {'id':question.id})}}">{{votes_count}}</span>
                     <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-up"></span></span>
                   {% else %}
-                    <span class="vote-counts down">{{votes_count|abs}}</span>
+                    <span class="vote-counts down" data-url="{{path('check_liking_question', {'id':question.id})}}">{{votes_count}}</span>
                     <span class="vote-icon"><span class="glyphicon glyphicon-thumbs-down"></span></span>
                   {% endif %}
                 </div>
@@ -117,7 +160,7 @@
                 </div>
               </div>
               <div class="media-body">
-                <h5><a href="#">{{question.title}}</a></h5>
+                <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
                 <small class="meta">
                   <span class="pr-1">{{question.creationDate|ago}}</span>
                   <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
@@ -127,39 +170,78 @@
                     <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
                   {% endfor %}
                 </div>
+                {% if app.user != null %}
+                  {{render(controller('App\\Controller\\FAQController::renderDeleteButton', {'question_id': question.id}))}}
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        {% if is_granted('ROLE_SUPERADMIN') %}
+          <button type="button" id="assign_question_faq_form_button" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assign_question_faq_form_modal" style="display:none;">FAQ</button>
+          <div class="modal fade" id="assign_question_faq_form_modal" tabindex="-1" aria-labelledby="assign_question_faq_form_button" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="assign_question_faq_form_label">New Assignment</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  {{form_start(assignQuestionFAQForm, {'attr': {'class': 'needs-validation', 'id': 'assign_question_faq_form'}})}}
+                    <div class="mb-3">
+                      <label for="assign_question_faq_form_faq" class="form-label">FAQ</label>
+                      <div id="assign_question_faq_form_faq">
+                        {% for checkbox in assignQuestionFAQForm.faq.children %}
+                          <div class="form-check form-check-inline">
+                            {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
+                            {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
+                          </div>
+                        {% endfor %}
+                      </div>
+                      <div id="assign_question_faq_form_faq_error" class="invalid-feedback">
+                        {{form_errors(assignQuestionFAQForm.faq)}}
+                      </div>
+                    </div>
+                    {{form_widget(assignQuestionFAQForm.question_id, {'attr': {'style': 'display:none;'}})}}
+                  {{form_end(assignQuestionFAQForm)}}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" form="assign_question_faq_form" class="btn btn-primary">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div><!-- end tab-pane -->
+    <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="tags-tab">
+      <div class="row align-items-center pb-4">
+        <div class="col-lg-10">
+          <h3>All FAQs</h3>
+        </div>
+        <div class="col-lg-2">
+        </div>
+      </div>
+      <div class="row">
+        <div class="faq-list col-lg-12">
+          {% for faq in faqs %}
+            <div class="media-card align-items-center">
+              <div class="media-body">
+                <div class="tags pb-1">
+                  <a href="{{path('faq', {'id': faq.id})}}" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
+                </div>
+                <p class="card-text fs-14 truncate-4 lh-24">
+                  {{faq.description}}
+                </p>
+                <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
+                  <p class="lh-18">{{faq.relatedQuestions|length}} questions</p>
+                </div>
                 {% if is_granted('ROLE_SUPERADMIN') %}
-                  <hr>
                   <div class="row mb-4">
                     <div class="col-lg-8"></div>
                     <div class="col-lg-4 mb-2">
-                      <a id="questionDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-                      <button type="button" id="assignFaqButton" class="btn btn-primary form-button mb-2" data-bs-toggle="modal" data-bs-target="#assignFaqModal">FAQ</button>
-                      <div class="modal fade" id="assignFaqModal" tabindex="-1" aria-labelledby="assignFaqButton" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="questionModalLabel">New Assignment</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                              <form id="faqForm" class="needs-validation" novalidate>
-                                <div class="mb-3">
-                                  <label for="assignment" class="form-label">Assignment</label>
-                                  <select id="assignment" class="form-select">
-                                    <option selected value="1">FAQ 1</option>
-                                    <option value="2">FAQ 2</option>
-                                    <option value="3">FAQ 3</option>
-                                  </select>
-                                </div>
-                              </form>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <a class="form-button delete_faq" href="{{path('delete_faq', {'id': faq.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                   </div>
                 {% endif %}
@@ -168,289 +250,31 @@
           {% endfor %}
         </div>
       </div>
-      {% if is_granted('ROLE_USER') %}
-        <div class="row mb-4">
-          <div class="col-lg-10"></div>
-          <div class="col-lg-2">
-            <a type="button" id="question_form_button" class="form-button" data-bs-toggle="modal" data-bs-target="#question_form_modal"><span class="glyphicon glyphicon-plus"></span></a>
-            <div class="modal fade" id="question_form_modal" tabindex="-1" aria-labelledby="question_form_button" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="question_form_label">New question</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    {{form_start(questionForm, {'attr': {'class': 'needs-validation', 'id': 'question_form'}})}}
-                      <div class="mb-3">
-                        <label for="question_form_title" class="form-label">Title</label>
-                        {{form_widget(questionForm.title, {'attr': {'class': 'form-control'}})}}
-                        <div id="question_form_title_error" class="invalid-feedback">
-                          {{form_errors(questionForm.title)}}
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="question_form_content" class="form-label">Content</label>
-                        {{form_widget(questionForm.content, {'attr': {'class': 'form-control'}})}}
-                        <div id="content_error" class="invalid-feedback">
-                          {{form_errors(questionForm.content)}}
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="question_form_belongingFAQs" class="form-label">Belongings FAQS</label>
-                        <br>
-                        <div id="question_form_belongingFAQs">
-                          {% for checkbox in questionForm.belongingFAQs.children %}
-                            <div class="form-check form-check-inline">
-                              {{form_widget(checkbox, {'attr': {'class': 'form-check-input'}})}}
-                              {{form_label(checkbox, null, {'label_attr': {'class': 'form-check-label'}})}}
-                            </div>
-                          {% endfor %}
-                        </div>
-                        {#{{form_widget(questionForm.belongingFAQs, {'attr': {'class': 'form-check-inline'}, 'label_attr': {'class':'form-check-label'}})}}#}
-                        <div id="question_form_belongingFAQs_error" class="invalid-feedback">
-                          {{form_errors(questionForm.belongingFAQs)}}
-                        </div>
-                      </div>
-                    {{form_end(questionForm)}}
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" form="question_form" class="btn btn-primary">Save changes</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endif %}
-      <div class="row">
-        <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
-          <div class="pager question-paginator">
-            <nav aria-label="Page navigation questions">
-              <ul class="pagination generic-pagination pr-1">
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <p class="fs-13 pt-3">Showing 1-15 results of 50,577 questions</p>
-          </div>
-        </div>
-      </div>
-    </div><!-- end tab-pane -->
-    <div class="tab-pane fade" id="tags" role="tabpanel" aria-labelledby="tags-tab">
-      <div class="row project-search">
-        <div class="col-lg-12 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search FAQ">
-        </div>
-      </div>
-      <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
-          <h3>All FAQs</h3>
-        </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option selected="">Newest</option>
-            <option value="1">Most Popular</option>
-            <option value="2">Alphabetically</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="faq-list col-lg-12">
-          <div class="media-card align-items-center">
-            <div class="media-body">
-              <div class="tags pb-1">
-                <a href="#" class="tag-link tag-link-md tag-link-blue">FAQ 1</a>
-              </div>
-              <p class="card-text fs-14 truncate-4 lh-24">
-                For questions regarding programming in ECMAScript (JavaScript/JS) and its various dialects/implementations (excluding ActionScript). Please include all relevant tags on your question; e.g., [node.js],…
-              </p>
-              <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
-                <p class="lh-18">2177849 questions, 901 asked today, 5319 this week</p>
-              </div>
-              <div class="row mb-4">
-                <div class="col-lg-10"></div>
-                <div class="col-lg-2">
-                  <a id="faqDeleteButton" class="form-button" href="#"><span class="glyphicon glyphicon-trash"></span></a>
-                  <a type="button" id="modifyFaqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#modifyFaqModal"><span class="glyphicon glyphicon-pencil"></span></a>
-                  <div class="modal fade" id="modifyFaqModal" tabindex="-1" aria-labelledby="modifyFaqButton" style="display: none;" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="questionModalLabel">Modify FAQ</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form id="modifyFaqForm" class="needs-validation" novalidate="">
-                            <div class="mb-3">
-                              <label for="title" class="form-label">Name</label>
-                              <input type="text" class="form-control" id="name" required="">
-                              <div id="name_error" class="invalid-feedback">Name error message.</div>
-                            </div>
-                            <div class="mb-3">
-                              <label for="description" class="form-label">Description</label>
-                              <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                              <div id="description_error" class="invalid-feedback">Description error message.</div>
-                            </div>
-                          </form>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          <button type="submit" form="modifyFaqForm" class="btn btn-primary">Save changes</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row mb-4">
-        <div class="col-lg-10"></div>
-        <div class="col-lg-2">
-          <a type="button" id="faqButton" class="form-button" data-bs-toggle="modal" data-bs-target="#faqModal"><span class="glyphicon glyphicon-plus"></span></a>
-        </div>
-      </div>
-      <div class="modal fade" id="faqModal" tabindex="-1" aria-labelledby="faqButton" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="questionModalLabel">New FAQ</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="faqForm" class="needs-validation" novalidate>
-                <div class="mb-3">
-                  <label for="title" class="form-label">Name</label>
-                  <input type="text" class="form-control" id="name" required />
-                  <div id="name_error" class="invalid-feedback">Name error message.</div>
-                </div>
-                <div class="mb-3">
-                  <label for="description" class="form-label">Description</label>
-                  <textarea class="form-control" id="description" rows="4" required=""></textarea>
-                  <div id="description_error" class="invalid-feedback">Description error message.</div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" form="faqForm" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
-          <div class="pager faq-paginator">
-            <nav aria-label="Page navigation FAQS">
-              <ul class="pagination generic-pagination pr-1">
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">«</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">»</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <p class="fs-13 pt-3">Showing 1-15 results of 50,577 questions</p>
-          </div>
-        </div>
-      </div>
     </div><!-- end tab-pane -->
     <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
-      <div class="row project-search">
-        <div class="col-lg-12 mb-3">
-          <input type="text" class="form-control search-input" placeholder="Search User">
-        </div>
-      </div>
       <div class="row align-items-center pb-4">
-        <div class="col-lg-8 pb-2">
+        <div class="col-lg-10">
           <h3>All users</h3>
         </div>
-        <div class="col-lg-4">
-          <select class="form-select form-select-no-form form-select-lg mb-3" aria-label=".form-select-lg example">
-            <option value="1">Most Questions asked</option>
-            <option value="2">Alphabetically</option>
-          </select>
+        <div class="col-lg-2">
         </div>
       </div>
       <div class="row">
         <div class="user-list col-lg-12">
-          <div class="media media-card p-3">
-            <a href="#" class="media-img d-inline-block">
-              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog" alt="company logo">
-            </a>
-            <div class="media-body">
-              <h5 class="fs-16 fw-medium"><a href="profile.html">werner94fribourg</a></h5>
-              <p class="meta d-block lh-24 pb-1"><span>Informatician</span></p>
-              <p class="fw-medium fs-15 text-black-50 lh-18">1,200 questions asked</p>
-            </div><!-- end media-body -->
-          </div>
+          {% for user in users %}
+            <div class="media media-card p-3">
+              <a href="{{path('profile', {'id': user.id})}}" class="media-img d-inline-block">
+                <img src="{{path('show_profile_picture', {'id': user.id})}}" alt="user-{{user.id}} profile picture">
+              </a>
+              <div class="media-body">
+                <h5 class="fs-16 fw-medium"><a href="{{path('profile', {'id': user.id})}}">{{user.username}}</a></h5>
+                <p class="meta d-block lh-24 pb-1"><span>{{user.occupation}}</span></p>
+                <p class="fw-medium fs-15 text-black-50 lh-18">{{user.askedQuestions|length}} questions asked</p>
+              </div><!-- end media-body -->
+            </div>
+          {% endfor %}
         </div>
       </div><!-- end tab-pane -->
-      <div class="row">
-        <div class="d-flex flex-wrap align-items-center justify-content-between pt-30px">
-          <div class="pager user-paginator">
-            <nav aria-label="Page navigation questions">
-              <ul class="pagination generic-pagination pr-1">
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">«</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">2</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">3</a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">»</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <p class="fs-13 pt-3">Showing 1-15 results of 50,577 questions</p>
-          </div>
-        </div>
-      </div>
     </div><!-- end tab-content -->
   </div>
 {% endblock %}
@@ -458,9 +282,46 @@
 {% block customfaqjavascripts %}
   {{parent()}}
   <script>
+    $('#faq_main_link').addClass("active");
+    $('.vote-counts').each(function(){
+      var $url = $(this).attr('data-url');
+      var tag = $(this);
+      if($url !== undefined)
+      {
+        $.ajax({
+          method: 'POST',
+          url: $url
+        }).done(function(data){
+          if(data.like == 'true' || data.dislike == 'true')
+            tag.attr('style', 'text-decoration:underline;');
+        })
+      }
+    });
     {% if newQuestionAttempt %}
       document.getElementById("question_form").classList.add("was-validated");
       $('#question_form_button')[0].click();
+    {% endif %}
+    {% if is_granted('ROLE_SUPERADMIN') %}
+      function showAssignQuestionFAQFormModal(question_id)
+      {
+        $('#assign_question_faq_form_faq').find('.form-check-input').each(function(){
+          var faq_id = $(this).val();
+          var tag = $(this);
+          $.ajax({
+            method: 'POST',
+            url: '/faqs/check-faq-belonging/'+faq_id+'/'+question_id
+          }).done(function(data){
+            if(data.belonging){
+              tag.attr('checked', true);
+              }
+              else {
+                tag.attr('checked', false);
+              }
+            })
+          });
+        $('#assign_question_faq_form_button')[0].click();
+        $('#assign_question_faq_form_question_id').val(question_id);
+      }
     {% endif %}
   </script>
 {% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'faq/base.html.twig' %}
+
+{% block title %}Skill main page{% endblock %}
+
+{% block faqcontent %}
+  <div class="row mb-4 mt-2">
+    <h3>List of existing skills</h3>
+  </div>
+  <div class="skill-list">
+    {% for skill in skills %}
+      <div id="skill-{{skill.id}}" class="row">
+        <div class="media-card align-items-center">
+          <div class="media-body">
+            <div class="tags pb-1">
+              <a href="{{path('skill', {'id': skill.id})}}" class="tag-link tag-link-md tag-link-blue">{{skill.name}}</a>
+            </div>
+          <p class="card-text fs-14 truncate-4 lh-24">
+            {{skill.description}}
+           </p>
+           <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
+             <p class="lh-18">{{skill.usersThatHasSkill|length}} competent users</p>
+           </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block customfaqjavascripts %}
+  {{parent()}}
+  <script>
+    $('#faq_dropdown').removeClass("active");
+    $('#skill_link').addClass("active");
+  </script>
+{% endblock %}

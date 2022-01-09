@@ -33,13 +33,13 @@
     <div class="media-card align-items-center">
       <div class="media-body">
         <div class="tags pb-1">
-          <a href="#" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
+          <a href="{{path('faq', {'id': faq.id})}}" class="tag-link tag-link-md tag-link-blue">{{faq.name}}</a>
         </div>
         <p class="card-text fs-14 truncate-4 lh-24">
           {{faq.description}}
         </p>
         <div class="d-flex tags-info fs-14 pt-3 border-top mt-3">
-          <p class="lh-18">{{faq.relatedQuestions|length}} questions, {{todayQuestions|length}} asked today, {{weeklyQuestions|length}} this week</p>
+          <p class="lh-18">{{faq.relatedQuestions|length}} questions</p>
         </div>
         {% if is_granted('ROLE_SUPERADMIN') %}
           <div class="row mb-4">
@@ -140,7 +140,7 @@
             </div>
           </div>
           <div class="media-body">
-            <h5><a href="#">{{question.title}}</a></h5>
+            <h5><a href="{{path('question', {'id': question.id})}}">{{question.title}}</a></h5>
             <small class="meta">
               <span class="pr-1">{{question.creationDate|ago}}</span>
               <a href="{{path('profile', {'id': question.creator.id})}}" class="author">{{question.creator.username}}</a>
@@ -150,12 +150,12 @@
                 <a href="{{path('faq', {'id': belongingFaq.id})}}" class="tag-link">{{belongingFaq.name}}</a>
               {% endfor %}
             </div>
-            {% if is_granted('ROLE_SUPERADMIN') %}
+            {% if is_granted('ROLE_SUPERADMIN') or (app.user != null and (app.user.id == question.creator.id or (faq.moderator != null and app.user.id == faq.moderator.id))) %}
               <hr>
               <div class="row mb-4">
                 <div class="col-lg-10"></div>
                 <div class="col-lg-2">
-                  <a class="form-button delete_questions" href="#" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
+                  <a class="form-button delete_question" href="{{path('delete_question', {'id': question.id})}}" onclick="alert('Are you sure ?');"><span class="glyphicon glyphicon-trash"></span></a>
                 </div>
               </div>
             {% endif %}
@@ -169,6 +169,7 @@
 {% block customfaqjavascripts %}
   {{parent()}}
   <script>
+    $('#faq-{{faq.id}}').addClass("active");
     {% if modifyFAQAttempt %}
       document.getElementById("faq_form").classList.add("was-validated");
       $("#faq_form_button")[0].click();

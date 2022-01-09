@@ -36,6 +36,7 @@ class Skill
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, mappedBy="userSkills")
+     * @ORM\OrderBy({"username" = "ASC"})
      * @ORM\JoinTable(name="shared_skills")
      */
     private $usersThatHasSkill;

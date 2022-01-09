@@ -1,0 +1,3 @@
+{% for faq in faqs %}
+  <li><a class="dropdown-item" href="{{path('faq', {'id': faq.id})}}" id="faq-{{faq.id}}">{{faq.name}}</a></li>
+{% endfor %}
